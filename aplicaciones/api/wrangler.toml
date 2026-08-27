@@ -1,0 +1,38 @@
+name = "presentacion-mr-robot-api"
+main = "src/index.js"
+compatibility_date = "2026-08-27"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENTORNO = "desarrollo"
+CORS_ORIGEN_PERMITIDO = "http://localhost:5173"
+LIMITE_CUERPO_BYTES = "1048576"
+RATE_LIMIT_MAXIMO = "120"
+RATE_LIMIT_VENTANA_MS = "60000"
+# Configurar como secreto real con: wrangler secret put HF_TOKEN
+# No guardar tokens reales en este archivo.
+
+[env.production]
+name = "presentacion-mr-robot-api"
+
+[env.production.vars]
+ENTORNO = "produccion"
+# Cambiar por la URL final de Cloudflare Pages cuando exista.
+CORS_ORIGEN_PERMITIDO = "https://presentacion-mr-robot-panel.pages.dev"
+LIMITE_CUERPO_BYTES = "1048576"
+RATE_LIMIT_MAXIMO = "120"
+RATE_LIMIT_VENTANA_MS = "60000"
+# Configurar secretos reales con:
+# wrangler secret put SUPABASE_URL --env production
+# wrangler secret put SUPABASE_ANON_KEY --env production
+# wrangler secret put SUPABASE_SERVICE_ROLE_KEY --env production
+# Variable opcional no secreta: SUPABASE_BUCKET_AUDIO = "audios"
+# wrangler secret put CLOUDINARY_CLOUD_NAME --env production
+# wrangler secret put CLOUDINARY_API_KEY --env production
+# wrangler secret put CLOUDINARY_API_SECRET --env production
+# wrangler secret put HF_TOKEN --env production
+# wrangler secret put GITHUB_TOKEN --env production
+# wrangler secret put GITHUB_REPOSITORIO --env production
+# Variables opcionales:
+# GITHUB_WORKFLOW_RENDER = "renderizar-video.yml"
+# GITHUB_RAMA_RENDER = "main"

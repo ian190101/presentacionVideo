@@ -1,0 +1,82 @@
+name: Renderizar video
+
+on:
+  workflow_dispatch:
+    inputs:
+      formato:
+        description: Formato a renderizar
+        required: true
+        default: ambos
+        type: choice
+        options:
+          - ambos
+          - horizontal
+          - vertical
+      calidad:
+        description: Perfil de render
+        required: true
+        default: rapida
+        type: choice
+        options:
+          - rapida
+          - equilibrada
+          - alta
+      datos_json_base64:
+        description: JSON de presentacion codificado en base64. Si se deja vacio usa el ejemplo del repositorio.
+        required: false
+        type: string
+
+jobs:
+  renderizar:
+    name: Renderizar MP4
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar estructura
+        run: npm run verificar
+
+      - name: Auditar produccion
+        run: npm run auditar
+
+      - name: Ejecutar pruebas
+        run: npm run probar
+
+      - name: Preparar datos de render
+        run: |
+          mkdir -p tmp/render
+          if [ -n "${{ inputs.datos_json_base64 }}" ]; then
+            echo "${{ inputs.datos_json_base64 }}" | base64 --decode > tmp/render/datos-presentacion.json
+          else
+            cp scripts/renderizar-video/datos-presentacion-ejemplo.json tmp/render/datos-presentacion.json
+          fi
+
+      - name: Renderizar video
+        run: npm run video:render:datos -- --formato "${{ inputs.formato }}" --calidad "${{ inputs.calidad }}" --datos tmp/render/datos-presentacion.json --salida dist/videos --pagina dist/pagina
+
+      - name: Publicar pagina como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: pagina-presentacion
+          path: dist/pagina
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar videos como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-presentacion
+          path: dist/videos/*.mp4
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,43 @@
+{
+  "name": "presentacion-mr-robot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "panel:dev": "vite --config vite.config.js",
+    "panel:build": "vite build --config vite.config.js",
+    "panel:preview": "vite preview --config vite.config.js",
+    "video:preview": "remotion studio aplicaciones/video/src/index.jsx",
+    "video:render:horizontal": "remotion render aplicaciones/video/src/index.jsx PresentacionHorizontal dist/videos/presentacion-horizontal.mp4",
+    "video:render:vertical": "remotion render aplicaciones/video/src/index.jsx PresentacionVertical dist/videos/presentacion-vertical.mp4",
+    "video:render:datos": "node scripts/renderizar-video/renderizarPresentacion.js",
+    "pagina:exportar": "node scripts/exportar-pagina/exportarPaginaPresentacion.js",
+    "pagina:deploy:produccion": "wrangler pages deploy dist/pagina --project-name presentacion-mr-robot-publica --branch main",
+    "api:dev": "wrangler dev --config aplicaciones/api/wrangler.toml",
+    "api:deploy": "wrangler deploy --config aplicaciones/api/wrangler.toml",
+    "api:deploy:produccion": "wrangler deploy --config aplicaciones/api/wrangler.toml --env production",
+    "panel:deploy:produccion": "wrangler pages deploy dist/panel --project-name presentacion-mr-robot-panel --branch main",
+    "verificar": "node scripts/verificar-calidad/verificar-estructura.js",
+    "auditar": "node scripts/verificar-calidad/auditar-produccion.js",
+    "probar": "node scripts/pruebas/prueba-validaciones-api.js && node scripts/pruebas/prueba-contrato-render.js && node scripts/pruebas/prueba-exportacion-pagina.js"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.28",
+    "@remotion/cli": "^4.0.518",
+    "@remotion/renderer": "^4.0.518",
+    "@supabase/supabase-js": "^2.56.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.518",
+    "sweetalert2": "^11.26.25",
+    "vite": "^6.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Logo temporal de cliente">
+  <rect width="640" height="360" fill="#f6f8fb"/>
+  <rect x="140" y="92" width="360" height="176" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+  <circle cx="226" cy="180" r="42" fill="#22c7dd"/>
+  <text x="312" y="190" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="800">CLIENTE</text>
+</svg>

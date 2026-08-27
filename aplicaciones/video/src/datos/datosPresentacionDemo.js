@@ -1,0 +1,108 @@
+export const datosPresentacionDemo = {
+  empresaObjetivo: "Sofia Embutidos",
+  colorPrimario: "#d40511",
+  colorSecundario: "#22c7dd",
+  eslogan:
+    "Desarrollamos soluciones informaticas a medida, desde sistemas web hasta aplicaciones moviles.",
+  subtitulo:
+    "Automatizamos tus procesos para que tu te enfoques en crecer. Listo para ensamblar el engranaje que te falta?",
+  clientes: [
+    "FIEA - ONG en Ecuador",
+    "Calaminas Aroma - 5 sucursales nacionales",
+    "Emprendedores y empresas nuevas"
+  ],
+  proyectos: ["Proyecto FIEA", "Sistema para ferreteria", "Espacio para nuevo proyecto"],
+  quienesSomos:
+    "Somos un equipo integral con apoyo legal, comercial, social y tecnico, enfocado en convertir procesos complejos en sistemas claros y escalables.",
+  equipo: [
+    {
+      nombre: "Ian Vers",
+      cargo: "Arquitecto full stack",
+      especialidad: "Arquitectura, backend y automatizacion",
+      resumenProfesional: "Arquitectura tecnica, backend, automatizacion y producto.",
+      experiencia: "Construccion de sistemas web, APIs, automatizaciones y soluciones comerciales a medida.",
+      cv: {
+        estudios: ["Formacion continua en arquitectura de software y desarrollo full stack"],
+        certificaciones: ["Buenas practicas DevSecOps y despliegue cloud"],
+        logros: ["Direccion tecnica de soluciones para clientes nacionales e internacionales"],
+        stackPrincipal: "React, Node.js, Cloudflare Workers, Supabase, PostgreSQL, Remotion"
+      },
+      habilidades: [
+        ["Backend", 92],
+        ["Frontend", 84],
+        ["Automatizacion", 88]
+      ]
+    },
+    {
+      nombre: "Omar Barea",
+      cargo: "Desarrollo y soporte",
+      especialidad: "Implementacion y soporte tecnico",
+      resumenProfesional: "Desarrollo, implementacion, soporte tecnico y continuidad operativa.",
+      experiencia: "Implementacion de sistemas, soporte a usuarios y ajustes operativos.",
+      cv: {
+        estudios: ["Formacion tecnica orientada a sistemas y soporte"],
+        certificaciones: [],
+        logros: ["Acompanamiento tecnico en despliegues y soporte de soluciones"],
+        stackPrincipal: "Frontend, soporte, integraciones y documentacion tecnica"
+      },
+      habilidades: [
+        ["Frontend", 76],
+        ["Soporte", 88],
+        ["Integraciones", 70]
+      ]
+    },
+    {
+      nombre: "Oscar Anave",
+      cargo: "Gestion comercial",
+      especialidad: "Comercial, procesos y seguimiento",
+      resumenProfesional: "Gestion comercial, levantamiento de necesidades y seguimiento operativo.",
+      experiencia: "Procesos comerciales, coordinacion y comunicacion con clientes.",
+      cv: {
+        estudios: ["Formacion orientada a gestion y procesos"],
+        certificaciones: [],
+        logros: ["Apoyo en relacion comercial y organizacion de procesos internos"],
+        stackPrincipal: "Gestion, procesos, comunicacion comercial y seguimiento"
+      },
+      habilidades: [
+        ["Comercial", 90],
+        ["Procesos", 82],
+        ["Gestion", 78]
+      ]
+    },
+    {
+      nombre: "Santiago",
+      cargo: "Apoyo operativo",
+      especialidad: "Documentacion y validacion",
+      resumenProfesional: "Apoyo operativo para documentacion, validacion y seguimiento de tareas.",
+      experiencia: "Asistencia, control documental y revision funcional.",
+      cv: {
+        estudios: ["Formacion operativa y administrativa"],
+        certificaciones: [],
+        logros: ["Apoyo en documentacion y validacion de entregables"],
+        stackPrincipal: "Documentacion, QA funcional, operacion y seguimiento"
+      },
+      habilidades: [
+        ["Documentacion", 80],
+        ["QA", 72],
+        ["Operacion", 76]
+      ]
+    }
+  ],
+  cierre:
+    "Sofia Embutidos puede fortalecer su operacion nacional con automatizacion y sistemas preparados para crecer.",
+  audioNarracionUrl: "audio/narracion-demo.wav",
+  secciones: [
+    { tipo: "intro", activa: true, orden: 1, duracionFrames: 150 },
+    { tipo: "clientes", activa: true, orden: 2, duracionFrames: 120 },
+    { tipo: "proyectos", activa: true, orden: 3, duracionFrames: 120 },
+    { tipo: "quienes_somos", activa: true, orden: 4, duracionFrames: 120 },
+    { tipo: "equipo", activa: true, orden: 5, duracionFrames: 150 },
+    { tipo: "habilidades", activa: true, orden: 6, duracionFrames: 150 },
+    { tipo: "cierre", activa: true, orden: 7, duracionFrames: 150 }
+  ],
+  assets: {
+    logo: "placeholders/logo-mr-robot-placeholder.svg",
+    capturaProyecto: "placeholders/captura-proyecto-placeholder.svg",
+    fotoIntegrante: "placeholders/foto-integrante-placeholder.svg"
+  }
+};

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Foto temporal de integrante">
+  <rect width="512" height="512" rx="34" fill="#eef3f8"/>
+  <circle cx="256" cy="190" r="78" fill="#cbd5e1"/>
+  <path d="M116 414c22-82 78-124 140-124s118 42 140 124" fill="#22c7dd"/>
+  <text x="256" y="462" text-anchor="middle" fill="#334155" font-family="Arial, sans-serif" font-size="26" font-weight="700">INTEGRANTE</text>
+</svg>
