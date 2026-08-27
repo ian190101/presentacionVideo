@@ -92,16 +92,38 @@ npm run panel:deploy:produccion
 
 ## Despliegue automatico
 
-El workflow `.github/workflows/desplegar-produccion.yml` ejecuta:
+El workflow `.github/workflows/desplegar-produccion.yml` ejecuta verificaciones en cada push a `main`.
+
+En cada `push` ejecuta:
 
 1. Instalacion limpia con `npm ci`.
 2. Verificacion estructural.
 3. Auditoria de produccion.
 4. Build del panel.
-5. Deploy del Worker.
-6. Deploy de Cloudflare Pages.
 
-Se ejecuta al hacer push a `main` o manualmente desde GitHub Actions.
+El deploy real a Cloudflare se ejecuta solo manualmente desde GitHub Actions con `workflow_dispatch`, para evitar checks rojos cuando aun no estan configurados los secrets de Cloudflare.
+
+Para desplegar:
+
+1. Ir a GitHub > Actions.
+2. Abrir `Desplegar produccion`.
+3. Seleccionar `Run workflow`.
+
+En ejecucion manual valida primero:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `VITE_API_URL`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Si falta alguno, el workflow falla temprano con un mensaje claro.
+
+Cuando los secrets existen, despliega:
+
+1. Worker API.
+2. Panel Cloudflare Pages.
+3. Pagina publica Cloudflare Pages.
 
 ## Render bajo demanda
 
