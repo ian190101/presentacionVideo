@@ -1,6 +1,6 @@
 # Guia de despliegue a produccion
 
-Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare Pages, Cloudflare Workers, Supabase Free, Cloudinary Free, Hugging Face y GitHub Actions.
+Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare Pages, Cloudflare Workers, Supabase Free, Cloudinary Free, Hugging Face y GitHub Actions solo como CI.
 
 ## Componentes
 
@@ -10,11 +10,11 @@ Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare 
 - Imagenes: Cloudinary.
 - Audios cacheados: Supabase Storage como primera opcion.
 - TTS: Hugging Face con Kokoro.
-- CI/CD: GitHub Actions.
+- CI: GitHub Actions solo valida calidad. El deploy y los secretos reales viven en Cloudflare.
 
 ## Variables publicas del panel
 
-Configurar en Cloudflare Pages y en GitHub Actions:
+Configurar en Cloudflare Pages:
 
 - `VITE_API_URL`: URL publica del Worker.
 - `VITE_SUPABASE_URL`: URL del proyecto Supabase.
@@ -42,15 +42,17 @@ Regla: ninguna clave secreta se guarda en archivos del repositorio.
 
 ## Secretos de GitHub Actions
 
-Configurar en el repositorio:
+No guardar secretos reales en GitHub Actions.
 
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `VITE_API_URL`
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+GitHub Actions solo ejecuta CI con valores placeholder para compilar:
 
-El token de Cloudflare debe tener permisos para desplegar Workers y Pages del proyecto.
+- `npm run verificar`
+- `npm run auditar`
+- `npm run probar`
+- `npm run panel:build`
+- `npm run pagina:exportar`
+
+El deploy se hace desde Cloudflare conectado al repositorio o desde Wrangler local autenticado en tu maquina. Asi evitamos guardar `CLOUDFLARE_API_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY`, `CLOUDINARY_API_SECRET` o `HF_TOKEN` en GitHub.
 
 ## Despliegue manual local
 
@@ -90,40 +92,72 @@ npm run api:deploy:produccion
 npm run panel:deploy:produccion
 ```
 
-## Despliegue automatico
+## CI en GitHub
 
-El workflow `.github/workflows/desplegar-produccion.yml` ejecuta verificaciones en cada push a `main`.
+El workflow `.github/workflows/desplegar-produccion.yml` ejecuta verificaciones en cada push a `main`, en pull requests y manualmente.
 
-En cada `push` ejecuta:
+Ejecuta:
 
 1. Instalacion limpia con `npm ci`.
 2. Verificacion estructural.
 3. Auditoria de produccion.
 4. Build del panel.
+5. Exportacion de pagina publica.
 
-El deploy real a Cloudflare se ejecuta solo manualmente desde GitHub Actions con `workflow_dispatch`, para evitar checks rojos cuando aun no estan configurados los secrets de Cloudflare.
+No despliega a Cloudflare y no lee secrets reales.
 
-Para desplegar:
+## Despliegue recomendado desde Cloudflare
 
-1. Ir a GitHub > Actions.
-2. Abrir `Desplegar produccion`.
-3. Seleccionar `Run workflow`.
+### Panel administrativo en Cloudflare Pages
 
-En ejecucion manual valida primero:
+1. Ir a Cloudflare Dashboard.
+2. Entrar a `Workers & Pages`.
+3. Crear un proyecto Pages conectado al repo `ian190101/presentacionVideo`.
+4. Build command:
 
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `VITE_API_URL`
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+```bash
+npm run panel:build
+```
 
-Si falta alguno, el workflow falla temprano con un mensaje claro.
+5. Output directory:
 
-Cuando los secrets existen, despliega:
+```txt
+dist/panel
+```
 
-1. Worker API.
-2. Panel Cloudflare Pages.
-3. Pagina publica Cloudflare Pages.
+6. Variables de entorno en Cloudflare Pages:
+
+```txt
+VITE_API_URL
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+
+### Pagina publica en Cloudflare Pages
+
+Crear otro proyecto Pages conectado al mismo repo.
+
+Build command:
+
+```bash
+npm run pagina:exportar
+```
+
+Output directory:
+
+```txt
+dist/pagina
+```
+
+Variable opcional:
+
+```txt
+SUBDOMINIO_PAGINA
+```
+
+### Worker API
+
+Desplegar el Worker desde Cloudflare o desde Wrangler local. Los secretos se agregan en Cloudflare Worker como variables tipo `Secret`, no en GitHub.
 
 ## Render bajo demanda
 

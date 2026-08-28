@@ -84,9 +84,15 @@ for (const nombre of nombresTablaProhibidos) {
   }
 }
 
-for (const requerido of ["desplegar_api", "desplegar_panel", "desplegar_pagina_publica", "npm run verificar", "npm run panel:build", "npm run pagina:exportar"]) {
+for (const requerido of ["name: Validar produccion", "npm run verificar", "npm run auditar", "npm run probar", "npm run panel:build", "npm run pagina:exportar"]) {
   if (!workflow.includes(requerido)) {
     errores.push(`El workflow de produccion no contiene: ${requerido}`);
+  }
+}
+
+for (const prohibido of ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID", "wrangler deploy", "wrangler pages deploy", "SUPABASE_SERVICE_ROLE_KEY", "CLOUDINARY_API_SECRET", "HF_TOKEN"]) {
+  if (workflow.includes(prohibido)) {
+    errores.push(`El workflow de produccion expone o usa un secreto/accion no permitida: ${prohibido}`);
   }
 }
 
