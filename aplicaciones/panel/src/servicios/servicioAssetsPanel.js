@@ -35,7 +35,6 @@ export async function subirImagenCloudinary({ sesion, presentacion, archivo, tip
   datosSubida.append("signature", firma.datos.signature);
   datosSubida.append("folder", firma.datos.folder);
   datosSubida.append("public_id", firma.datos.publicId);
-  datosSubida.append("transformation", firma.datos.transformation);
 
   const respuestaCloudinary = await fetch(`https://api.cloudinary.com/v1_1/${firma.datos.cloudName}/image/upload`, {
     method: "POST",
@@ -124,7 +123,7 @@ async function registrarAssetSubido({ sesion, presentacion, tipo, subida, archiv
       presentacionId: presentacion.id,
       tipo,
       proveedor: "cloudinary",
-      urlPublica: subida.secure_url,
+      urlPublica: crearUrlOptimizadaCloudinary(subida.secure_url),
       rutaStorage: subida.public_id,
       formato: subida.format,
       mimeType: archivo.type,
@@ -136,3 +135,10 @@ async function registrarAssetSubido({ sesion, presentacion, tipo, subida, archiv
   });
 }
 
+function crearUrlOptimizadaCloudinary(url) {
+  if (!url || !url.includes("/upload/")) {
+    return url;
+  }
+
+  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}

@@ -41,7 +41,11 @@ export async function registrarAsset({ entorno, token, usuario, datos }) {
 }
 
 export async function crearFirmaSubidaImagen({ entorno, datos }) {
-  if (!entorno.CLOUDINARY_CLOUD_NAME || !entorno.CLOUDINARY_API_KEY || !entorno.CLOUDINARY_API_SECRET) {
+  const cloudName = limpiarCredencial(entorno.CLOUDINARY_CLOUD_NAME);
+  const apiKey = limpiarCredencial(entorno.CLOUDINARY_API_KEY);
+  const apiSecret = limpiarCredencial(entorno.CLOUDINARY_API_SECRET);
+
+  if (!cloudName || !apiKey || !apiSecret) {
     return {
       modo: "pendiente_configuracion",
       mensaje: "Cloudinary todavia no esta configurado completamente en variables de entorno."
@@ -54,19 +58,17 @@ export async function crearFirmaSubidaImagen({ entorno, datos }) {
   const parametros = {
     folder: carpeta,
     public_id: publicId,
-    timestamp,
-    transformation: "f_auto,q_auto"
+    timestamp
   };
-  const signature = await firmarCloudinary(parametros, entorno.CLOUDINARY_API_SECRET);
+  const signature = await firmarCloudinary(parametros, apiSecret);
 
   return {
     modo: "firma_generada",
-    cloudName: entorno.CLOUDINARY_CLOUD_NAME,
-    apiKey: entorno.CLOUDINARY_API_KEY,
+    cloudName,
+    apiKey,
     timestamp,
     folder: carpeta,
     publicId,
-    transformation: parametros.transformation,
     signature
   };
 }
@@ -101,4 +103,8 @@ function normalizarPublicId(valor) {
     .replace(/[^a-z0-9_-]/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 80);
+}
+
+function limpiarCredencial(valor) {
+  return String(valor || "").trim();
 }
