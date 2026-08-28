@@ -1,4 +1,5 @@
 import { exigirUsuarioAutenticado } from "../servicios/servicioAutenticacion.js";
+import { registrarEventoAuditoria } from "../servicios/servicioAuditoria.js";
 import {
   actualizarContenido,
   crearContenido,
@@ -64,6 +65,18 @@ export async function manejarRutaContenido(solicitud, entorno) {
     }
 
     const datos = await crearContenido({ entorno, token: usuario.token, entidad, datos: validacion.datos });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: `${entidad}_creado`,
+      entidadTipo: entidad,
+      entidadId: datos?.id,
+      detalle: { presentacionId: datos?.presentacion_id || validacion.datos.presentacionId || null }
+    });
+
     return responderJson({ datos }, 201);
   }
 
@@ -81,11 +94,35 @@ export async function manejarRutaContenido(solicitud, entorno) {
     }
 
     const datos = await actualizarContenido({ entorno, token: usuario.token, entidad, id, datos: validacion.datos });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: `${entidad}_actualizado`,
+      entidadTipo: entidad,
+      entidadId: datos?.id || id,
+      detalle: { campos: Object.keys(validacion.datos) }
+    });
+
     return responderJson({ datos });
   }
 
   if (solicitud.method === "DELETE" && id) {
     const datos = await eliminarContenido({ entorno, token: usuario.token, entidad, id });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: `${entidad}_eliminado`,
+      entidadTipo: entidad,
+      entidadId: datos?.id || id,
+      detalle: { softDelete: true }
+    });
+
     return responderJson({ datos });
   }
 
@@ -95,4 +132,3 @@ export async function manejarRutaContenido(solicitud, entorno) {
     estadoHttp: 405
   });
 }
-

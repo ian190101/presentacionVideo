@@ -9,6 +9,7 @@ import { PanelEstado } from "../componentes/PanelEstado.jsx";
 import { PanelConexiones } from "../componentes/PanelConexiones.jsx";
 import { PanelContenidoEditable } from "../componentes/PanelContenidoEditable.jsx";
 import { PanelAssets } from "../componentes/PanelAssets.jsx";
+import { PanelAuditoria } from "../componentes/PanelAuditoria.jsx";
 import { VistaPreviaVideo } from "../componentes/VistaPreviaVideo.jsx";
 import {
   ayudasIniciales,
@@ -334,9 +335,12 @@ export function AplicacionPanel() {
             <section id="seccion-usuarios" className="scroll-mt-24">
               <EquipoResumen integrantes={integrantes} colorSecundario={presentacion.colorSecundario} />
             </section>
-            <section id="seccion-auditoria" className="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
-              <h2 className="text-lg font-bold text-slate-950">Auditoria</h2>
-              <p className="mt-1 text-sm text-slate-500">Los eventos criticos se registraran aqui cuando la API tenga auditoria activa.</p>
+            <section id="seccion-auditoria" className="scroll-mt-24">
+              <PanelAuditoria
+                sesion={sesion}
+                colorPrimario={presentacion.colorPrimario}
+                colorSecundario={presentacion.colorSecundario}
+              />
             </section>
           </div>
           <aside className="grid h-fit gap-4 xl:sticky xl:top-20">

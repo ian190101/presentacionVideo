@@ -1,4 +1,5 @@
 import { exigirUsuarioAutenticado } from "../servicios/servicioAutenticacion.js";
+import { registrarEventoAuditoria } from "../servicios/servicioAuditoria.js";
 import { exportarDatosRender, solicitarRender } from "../servicios/servicioRender.js";
 import { responderError, responderJson } from "../servicios/servicioRespuesta.js";
 import { validarSolicitudRender } from "../validaciones/validacionRender.js";
@@ -49,6 +50,23 @@ export async function manejarRutaRender(solicitud, entorno) {
       datos: validacion.datos
     });
 
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "render_solicitado",
+      entidadTipo: "solicitud_render",
+      entidadId: resultado.solicitud?.[0]?.id || null,
+      detalle: {
+        presentacionId: validacion.datos.presentacionId,
+        formato: validacion.datos.formato,
+        calidad: validacion.datos.calidad,
+        origen: validacion.datos.origen,
+        workflowDisparado: Boolean(resultado.workflow)
+      }
+    });
+
     return responderJson({ datos: resultado }, 201);
   }
 
@@ -58,4 +76,3 @@ export async function manejarRutaRender(solicitud, entorno) {
     estadoHttp: 405
   });
 }
-

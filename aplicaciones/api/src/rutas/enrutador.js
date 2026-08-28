@@ -1,5 +1,6 @@
 import { manejarRutaAyuda } from "./rutaAyuda.js";
 import { manejarRutaAsset } from "./rutaAsset.js";
+import { manejarRutaAuditoria } from "./rutaAuditoria.js";
 import { manejarRutaContenido } from "./rutaContenido.js";
 import { manejarRutaIntegracion } from "./rutaIntegracion.js";
 import { manejarRutaNarracion } from "./rutaNarracion.js";
@@ -27,6 +28,10 @@ export async function enrutarSolicitud(solicitud, entorno, contexto) {
 
   if (ruta.startsWith("/asset")) {
     return manejarRutaAsset(solicitud, entorno, contexto);
+  }
+
+  if (ruta.startsWith("/auditoria")) {
+    return manejarRutaAuditoria(solicitud, entorno, contexto);
   }
 
   if (ruta.startsWith("/integracion")) {

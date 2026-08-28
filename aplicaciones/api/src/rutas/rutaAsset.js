@@ -1,4 +1,5 @@
 import { exigirUsuarioAutenticado } from "../servicios/servicioAutenticacion.js";
+import { registrarEventoAuditoria } from "../servicios/servicioAuditoria.js";
 import { crearFirmaSubidaImagen, listarAssets, registrarAsset } from "../servicios/servicioAsset.js";
 import { responderError, responderJson } from "../servicios/servicioRespuesta.js";
 import { validarRegistroAsset } from "../validaciones/validacionAsset.js";
@@ -39,12 +40,45 @@ export async function manejarRutaAsset(solicitud, entorno) {
       datos: validacion.datos
     });
 
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "asset_registrado",
+      entidadTipo: "asset",
+      entidadId: asset?.id,
+      detalle: {
+        presentacionId: asset?.presentacion_id,
+        tipo: asset?.tipo,
+        proveedor: asset?.proveedor,
+        mimeType: asset?.mime_type,
+        tamanoBytes: asset?.tamano_bytes
+      }
+    });
+
     return responderJson({ datos: asset }, 201);
   }
 
   if (solicitud.method === "POST" && accion === "firma-subida-imagen") {
     const cuerpo = await solicitud.json();
     const firma = await crearFirmaSubidaImagen({ entorno, datos: cuerpo });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "asset_firma_subida_solicitada",
+      entidadTipo: "asset",
+      entidadId: null,
+      detalle: {
+        presentacionId: cuerpo.presentacionId || null,
+        nombreArchivo: cuerpo.nombreArchivo || null,
+        modo: firma.modo
+      }
+    });
+
     return responderJson({ datos: firma });
   }
 

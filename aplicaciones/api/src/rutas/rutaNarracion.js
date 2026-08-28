@@ -1,4 +1,5 @@
 import { exigirUsuarioAutenticado } from "../servicios/servicioAutenticacion.js";
+import { registrarEventoAuditoria } from "../servicios/servicioAuditoria.js";
 import { generarAudioNarracion } from "../servicios/servicioNarracion.js";
 import { responderError, responderJson } from "../servicios/servicioRespuesta.js";
 import { limpiarTexto } from "../validaciones/validacionComun.js";
@@ -30,6 +31,23 @@ export async function manejarRutaNarracion(solicitud, entorno) {
       entorno,
       token: usuario.token,
       datos
+    });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "narracion_audio_generado",
+      entidadTipo: "narracion",
+      entidadId: null,
+      detalle: {
+        presentacionId: datos.presentacionId || null,
+        voz: datos.voz,
+        velocidad: datos.velocidad,
+        modo: resultado.modo,
+        cacheado: resultado.modo === "cache"
+      }
     });
 
     return responderJson({ datos: resultado });

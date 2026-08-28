@@ -6,6 +6,7 @@ import {
   obtenerPresentacion,
   listarPresentaciones
 } from "../servicios/servicioPresentacion.js";
+import { registrarEventoAuditoria } from "../servicios/servicioAuditoria.js";
 import { responderError, responderJson } from "../servicios/servicioRespuesta.js";
 import { validarActualizacionPresentacion, validarNuevaPresentacion } from "../validaciones/validacionPresentacion.js";
 
@@ -46,6 +47,17 @@ export async function manejarRutaPresentacion(solicitud, entorno) {
       datos: validacion.datos
     });
 
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "presentacion_creada",
+      entidadTipo: "presentacion",
+      entidadId: presentacion?.id,
+      detalle: { nombre: presentacion?.nombre, empresaObjetivo: presentacion?.empresa_objetivo }
+    });
+
     return responderJson({ datos: presentacion }, 201);
   }
 
@@ -69,6 +81,17 @@ export async function manejarRutaPresentacion(solicitud, entorno) {
       datos: validacion.datos
     });
 
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "presentacion_actualizada",
+      entidadTipo: "presentacion",
+      entidadId: presentacion?.id || id,
+      detalle: { campos: Object.keys(validacion.datos) }
+    });
+
     return responderJson({ datos: presentacion });
   }
 
@@ -77,6 +100,17 @@ export async function manejarRutaPresentacion(solicitud, entorno) {
       entorno,
       token: usuario.token,
       id
+    });
+
+    await registrarEventoAuditoria({
+      entorno,
+      token: usuario.token,
+      usuario,
+      solicitud,
+      accion: "presentacion_eliminada",
+      entidadTipo: "presentacion",
+      entidadId: presentacion?.id || id,
+      detalle: { softDelete: true }
     });
 
     return responderJson({ datos: presentacion });
