@@ -15,7 +15,7 @@ La fase no incluye desplegar con credenciales reales porque esas claves viven fu
 - GitHub Actions como CI/CD.
 - Variables publicas separadas de secretos.
 - Headers de seguridad para Pages.
-- Redirect SPA para React/Vite.
+- Fallback SPA para React/Vite configurado en Workers Static Assets.
 - Scripts de despliegue local.
 - Guia operativa de produccion.
 - Verificacion automatizada extendida.
@@ -28,7 +28,7 @@ La fase no incluye desplegar con credenciales reales porque esas claves viven fu
 - `aplicaciones/api/.dev.vars.example`
 - `aplicaciones/api/wrangler.toml`
 - `aplicaciones/panel/public/_headers`
-- `aplicaciones/panel/public/_redirects`
+- `wrangler.json`
 - `package.json`
 - `scripts/verificar-calidad/verificar-estructura.js`
 - `docs/despliegue-produccion.md`
@@ -73,7 +73,10 @@ Tambien se agregan reglas de cache para assets y placeholders.
 
 ### SPA
 
-Se agrega `_redirects` para que React/Vite pueda manejar rutas internas en Cloudflare Pages.
+El panel usa `assets.not_found_handling = "single-page-application"` en `wrangler.json`.
+No se incluye `_redirects` en sus assets porque Workers Static Assets rechaza la
+regla `/* /index.html 200` como un bucle de redireccion. La pagina publica exportada
+para Pages conserva su propio `_redirects` independiente.
 
 ## Verificacion realizada
 
@@ -82,7 +85,7 @@ Se agrega `_redirects` para que React/Vite pueda manejar rutas internas en Cloud
   - `npm run panel:deploy:produccion`
 - Se agrego workflow de GitHub Actions.
 - Se agregaron plantillas de variables sin secretos reales.
-- Se agregaron headers y redirects del panel.
+- Se agregaron headers y fallback SPA del panel.
 - Se documento la guia de despliegue.
 - Se extendio la verificacion estructural para cubrir archivos de Fase 8.
 - `npm run verificar` ejecutado correctamente.

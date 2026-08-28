@@ -17,7 +17,6 @@ const archivosRequeridos = [
   "aplicaciones/api/src/middlewares/seguridad.js",
   "aplicaciones/api/src/middlewares/cors.js",
   "aplicaciones/panel/public/_headers",
-  "aplicaciones/panel/public/_redirects",
   ".github/workflows/desplegar-produccion.yml",
   "docs/despliegue-produccion.md"
 ];

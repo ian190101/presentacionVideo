@@ -162,6 +162,10 @@ No usar un `wrangler.json` generado por Cloudflare que tenga `assets` sin `direc
 
 El archivo `./aplicaciones/panel/worker.js` solo sirve los assets estaticos desde el binding `ASSETS`; no contiene secretos ni logica de backend.
 
+El panel no debe incluir `aplicaciones/panel/public/_redirects`. El fallback SPA ya
+lo resuelve `assets.not_found_handling`; combinar ambas configuraciones hace que
+Cloudflare rechace `/* /index.html 200` por bucle infinito con el codigo `100324`.
+
 Ademas, `wrangler.json` ejecuta `npm run panel:build` mediante `build.command` antes
 de validar y publicar los assets. Esto permite que el comando de despliegue funcione
 en un contenedor limpio aunque Cloudflare omita su paso de compilacion independiente.

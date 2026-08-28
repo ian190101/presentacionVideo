@@ -21,7 +21,6 @@ const archivosRequeridos = [
   "aplicaciones/api/wrangler.toml",
   "aplicaciones/api/src/middlewares/controlSolicitud.js",
   "aplicaciones/panel/public/_headers",
-  "aplicaciones/panel/public/_redirects",
   "aplicaciones/panel/worker.js",
   "aplicaciones/api/src/index.js",
   "aplicaciones/api/src/rutas/enrutador.js",
@@ -71,6 +70,10 @@ for (const archivo of archivosRequeridos) {
   if (!existsSync(archivo)) {
     errores.push(`Falta el archivo requerido: ${archivo}`);
   }
+}
+
+if (existsSync("aplicaciones/panel/public/_redirects")) {
+  errores.push("El panel en Workers no debe incluir _redirects; el fallback SPA se configura con assets.not_found_handling.");
 }
 
 const migracion = readFileSync("supabase/migraciones/001_modelo_inicial.sql", "utf8");
