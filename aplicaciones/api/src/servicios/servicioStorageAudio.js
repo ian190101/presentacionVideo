@@ -1,4 +1,5 @@
 import { responderError } from "./servicioRespuesta.js";
+import { crearCabecerasServicioSupabase, validarClaveServicioSupabase } from "./servicioSupabase.js";
 
 const BUCKET_AUDIO_PREDETERMINADO = "audios";
 
@@ -10,7 +11,7 @@ export async function subirAudioSupabase({ entorno, ruta, audio, contentType = "
   const respuesta = await fetch(`${entorno.SUPABASE_URL}/storage/v1/object/${bucket}/${ruta}`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${entorno.SUPABASE_SERVICE_ROLE_KEY}`,
+      ...crearCabecerasServicioSupabase(entorno.SUPABASE_SERVICE_ROLE_KEY),
       "Content-Type": contentType,
       "x-upsert": "true"
     },
@@ -50,6 +51,8 @@ function validarConfiguracionStorage(entorno) {
       detalles: faltantes
     });
   }
+
+  validarClaveServicioSupabase(entorno.SUPABASE_SERVICE_ROLE_KEY);
 }
 
 async function obtenerArrayBuffer(audio) {
@@ -71,4 +74,3 @@ async function obtenerArrayBuffer(audio) {
     estadoHttp: 500
   });
 }
-

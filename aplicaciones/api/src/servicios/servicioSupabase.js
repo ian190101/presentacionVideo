@@ -31,12 +31,12 @@ export async function consultarSupabase({ entorno, token, ruta, metodo = "GET", 
 
 export async function consultarSupabaseConServicio({ entorno, ruta, metodo = "GET", cuerpo }) {
   validarConfiguracionSupabaseServicio(entorno);
+  const cabecerasServicio = crearCabecerasServicioSupabase(entorno.SUPABASE_SERVICE_ROLE_KEY);
 
   const respuesta = await fetch(`${entorno.SUPABASE_URL}/rest/v1/${ruta}`, {
     method: metodo,
     headers: {
-      "apikey": entorno.SUPABASE_SERVICE_ROLE_KEY,
-      "Authorization": `Bearer ${entorno.SUPABASE_SERVICE_ROLE_KEY}`,
+      ...cabecerasServicio,
       "Content-Type": "application/json",
       "Prefer": "return=representation"
     },
@@ -82,4 +82,42 @@ function validarConfiguracionSupabaseServicio(entorno) {
       detalles: faltantes
     });
   }
+
+  validarClaveServicioSupabase(entorno.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+export function crearCabecerasServicioSupabase(claveServicio) {
+  const claveNormalizada = normalizarClaveSupabase(claveServicio);
+  const cabeceras = {
+    "apikey": claveNormalizada
+  };
+
+  if (esJwtSupabase(claveNormalizada)) {
+    cabeceras.Authorization = `Bearer ${claveNormalizada}`;
+  }
+
+  return cabeceras;
+}
+
+export function validarClaveServicioSupabase(claveServicio) {
+  const claveNormalizada = normalizarClaveSupabase(claveServicio);
+
+  if (esJwtSupabase(claveNormalizada) || claveNormalizada.startsWith("sb_secret_")) {
+    return;
+  }
+
+  throw responderError({
+    codigo: "supabase_service_role_invalida",
+    mensaje: "La clave de servicio de Supabase no tiene formato valido.",
+    estadoHttp: 500,
+    detalles: "Configura SUPABASE_SERVICE_ROLE_KEY con una secret key sb_secret_... o con la legacy service_role JWT. No uses la publishable/anon key en esta variable."
+  });
+}
+
+function normalizarClaveSupabase(clave) {
+  return String(clave || "").trim();
+}
+
+function esJwtSupabase(clave) {
+  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(clave);
 }

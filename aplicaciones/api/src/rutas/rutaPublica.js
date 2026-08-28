@@ -1,4 +1,4 @@
-import { obtenerLogoPublico } from "../servicios/servicioPublico.js";
+import { obtenerLogoPublico, obtenerTemaPublico } from "../servicios/servicioPublico.js";
 import { responderError, responderJson } from "../servicios/servicioRespuesta.js";
 
 export async function manejarRutaPublica(solicitud, entorno) {
@@ -8,6 +8,10 @@ export async function manejarRutaPublica(solicitud, entorno) {
 
   if (solicitud.method === "GET" && recurso === "logo") {
     return responderJson({ datos: await obtenerLogoPublico({ entorno }) });
+  }
+
+  if (solicitud.method === "GET" && recurso === "tema") {
+    return responderJson({ datos: await obtenerTemaPublico({ entorno }) });
   }
 
   return responderError({

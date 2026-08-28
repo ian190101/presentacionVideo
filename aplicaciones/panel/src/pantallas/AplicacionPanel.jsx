@@ -21,7 +21,7 @@ import {
 import { iniciarSesion } from "../servicios/servicioAutenticacion.js";
 import { cargarBorrador, guardarBorrador, solicitarRenderPanel } from "../servicios/servicioEditorPresentacion.js";
 import { listarAssetsPanel } from "../servicios/servicioAssetsPanel.js";
-import { obtenerLogoPublico } from "../servicios/servicioLogoPublico.js";
+import { obtenerLogoPublico, obtenerTemaPublico } from "../servicios/servicioLogoPublico.js";
 import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 import { LoginPanel } from "./LoginPanel.jsx";
 
@@ -47,15 +47,28 @@ export function AplicacionPanel() {
   useEffect(() => {
     let cancelado = false;
 
-    async function cargarLogoPublico() {
-      const logoUrl = await obtenerLogoPublico();
+    async function cargarIdentidadPublica() {
+      const [logoUrl, tema] = await Promise.all([
+        obtenerLogoPublico(),
+        obtenerTemaPublico()
+      ]);
 
       if (!cancelado && logoUrl) {
         setLogoPublicoUrl(logoUrl);
       }
+
+      if (!cancelado && tema) {
+        setPresentacion((actual) => ({
+          ...actual,
+          nombre: tema.nombre || actual.nombre,
+          empresaObjetivo: tema.empresaObjetivo || actual.empresaObjetivo,
+          colorPrimario: tema.colorPrimario || actual.colorPrimario,
+          colorSecundario: tema.colorSecundario || actual.colorSecundario
+        }));
+      }
     }
 
-    cargarLogoPublico();
+    cargarIdentidadPublica();
 
     return () => {
       cancelado = true;
@@ -206,7 +219,14 @@ export function AplicacionPanel() {
   if (!sesion) {
     return (
       <>
-        <LoginPanel onIngresar={manejarIngreso} logoUrl={logoPublicoUrl} />
+        <LoginPanel
+          onIngresar={manejarIngreso}
+          logoUrl={logoPublicoUrl}
+          colores={{
+            colorPrimario: presentacion.colorPrimario,
+            colorSecundario: presentacion.colorSecundario
+          }}
+        />
         {mensajeSesion && (
           <div className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-slate-950 px-4 py-2 text-sm text-white shadow-panel">
             {mensajeSesion}
