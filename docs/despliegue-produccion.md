@@ -125,7 +125,7 @@ npm run panel:build
 dist/panel
 ```
 
-6. Si Cloudflare lo despliega como Worker con Static Assets, usar el archivo raiz `wrangler.jsonc`. Este archivo ya define:
+6. Si Cloudflare lo despliega como Worker con Static Assets, usar el archivo raiz `wrangler.json`. Este archivo ya define:
 
 ```json
 {
@@ -145,6 +145,18 @@ VITE_SUPABASE_ANON_KEY
 ```
 
 No agregar tokens secretos del backend al panel. El panel solo recibe variables publicas `VITE_*`.
+
+### Panel como Workers Builds
+
+Si en GitHub aparece `Workers Builds`, Cloudflare no esta usando Pages clasico. En ese caso configurar el proyecto asi:
+
+```txt
+Build command: npm run panel:build
+Deploy command: npx wrangler deploy --config wrangler.json
+Root directory: /
+```
+
+No usar un `wrangler.json` generado por Cloudflare que tenga `assets` sin `directory`. El archivo valido es el del repositorio y apunta a `./dist/panel`.
 
 ### Pagina publica en Cloudflare Pages
 
