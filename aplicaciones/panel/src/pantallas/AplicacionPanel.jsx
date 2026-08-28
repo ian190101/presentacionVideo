@@ -224,6 +224,7 @@ export function AplicacionPanel() {
         onNavegar={navegarASeccion}
         seccionActiva={seccionActiva}
         colorPrimario={presentacion.colorPrimario}
+        colorSecundario={presentacion.colorSecundario}
         logoUrl={logoPublicoUrl}
       />
       <div className="min-w-0 flex-1">

@@ -30,6 +30,7 @@ export function BarraLateral({
   onNavegar,
   seccionActiva = "presentacion",
   colorPrimario = "#d40511",
+  colorSecundario = "#22c7dd",
   logoUrl = ""
 }) {
   function manejarNavegacion(id) {
@@ -71,20 +72,30 @@ export function BarraLateral({
         </div>
       </div>
       <nav className="px-3 py-4">
-        {opciones.map(([id, texto, Icono]) => (
+        {opciones.map(([id, texto, Icono]) => {
+          const activa = seccionActiva === id;
+          const estiloActivo = activa
+            ? {
+                backgroundColor: colorPrimario,
+                color: obtenerColorTextoActivo(colorPrimario, colorSecundario)
+              }
+            : undefined;
+
+          return (
           <button
             key={texto}
             type="button"
             onClick={() => manejarNavegacion(id)}
             className={`mb-1 flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm transition ${
-              seccionActiva === id ? "text-white" : "text-slate-300 hover:bg-white/8 hover:text-white"
+              activa ? "font-semibold" : "text-slate-300 hover:bg-white/8 hover:text-white"
             }`}
-            style={seccionActiva === id ? { backgroundColor: colorPrimario } : undefined}
+            style={estiloActivo}
           >
             <Icono size={18} aria-hidden="true" />
             {texto}
           </button>
-        ))}
+          );
+        })}
       </nav>
       <div className="m-3 rounded-md border border-white/10 bg-white/5 p-4 text-sm">
         <div className="mb-2 flex items-center gap-2 font-semibold">
@@ -118,4 +129,42 @@ export function BarraLateral({
       )}
     </>
   );
+}
+
+function obtenerColorTextoActivo(colorPrimario, colorSecundario) {
+  if (!esHexValido(colorSecundario) || !esHexValido(colorPrimario)) {
+    return "#ffffff";
+  }
+
+  const contrasteSecundario = calcularContraste(colorPrimario, colorSecundario);
+
+  if (contrasteSecundario >= 4.5) {
+    return colorSecundario;
+  }
+
+  return calcularContraste(colorPrimario, "#ffffff") >= calcularContraste(colorPrimario, "#0f172a")
+    ? "#ffffff"
+    : "#0f172a";
+}
+
+function calcularContraste(colorA, colorB) {
+  const luminanciaA = calcularLuminancia(colorA);
+  const luminanciaB = calcularLuminancia(colorB);
+  const claro = Math.max(luminanciaA, luminanciaB);
+  const oscuro = Math.min(luminanciaA, luminanciaB);
+
+  return (claro + 0.05) / (oscuro + 0.05);
+}
+
+function calcularLuminancia(hex) {
+  const valores = [1, 3, 5].map((inicio) => {
+    const canal = parseInt(hex.slice(inicio, inicio + 2), 16) / 255;
+    return canal <= 0.03928 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4;
+  });
+
+  return 0.2126 * valores[0] + 0.7152 * valores[1] + 0.0722 * valores[2];
+}
+
+function esHexValido(valor) {
+  return /^#[0-9a-f]{6}$/i.test(valor || "");
 }
