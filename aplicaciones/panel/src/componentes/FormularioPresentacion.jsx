@@ -19,7 +19,7 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
           </p>
         </div>
         <div className="flex gap-2">
-          <BotonIcono icono={Save} onClick={onGuardar}>Guardar</BotonIcono>
+          <BotonIcono icono={Save} onClick={onGuardar}>Guardar presentacion</BotonIcono>
           <BotonIcono icono={Video} variante="primario" colorPrimario={presentacion.colorPrimario} onClick={onGenerarVideo}>
             Generar video
           </BotonIcono>

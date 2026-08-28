@@ -51,7 +51,7 @@ export async function guardarBorrador({ sesion, presentacion, secciones, integra
     localStorage.setItem(CLAVE_BORRADOR_LOCAL, JSON.stringify({ presentacion, secciones, integrantes, clientes, proyectos }));
     return {
       modo: "local",
-      mensaje: "Borrador guardado en este navegador."
+      mensaje: "Presentacion guardada en este navegador."
     };
   }
 
@@ -88,7 +88,7 @@ export async function guardarBorrador({ sesion, presentacion, secciones, integra
 
   return {
     modo: "api",
-    mensaje: "Borrador guardado en Supabase mediante la API.",
+    mensaje: "Presentacion guardada en Supabase mediante la API.",
     presentacion: convertirPresentacionDesdeApi(presentacionGuardada)
   };
 }

@@ -156,7 +156,7 @@ export function AplicacionPanel() {
       }
 
       await mostrarOperacionExitosa({
-        titulo: "Borrador guardado",
+        titulo: "Presentacion guardada",
         mensaje: resultado.mensaje,
         detalles: `Modo: ${resultado.modo}`,
         colores: {
@@ -361,7 +361,7 @@ export function AplicacionPanel() {
                 onGenerarVideo={manejarGenerarVideo}
               />
             </section>
-            <BotonIcono icono={Save} variante="tenue" onClick={manejarGuardar}>Guardar borrador</BotonIcono>
+            <BotonIcono icono={Save} variante="tenue" onClick={manejarGuardar}>Guardar presentacion</BotonIcono>
           </aside>
         </main>
       </div>
