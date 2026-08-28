@@ -162,6 +162,10 @@ No usar un `wrangler.json` generado por Cloudflare que tenga `assets` sin `direc
 
 El archivo `./aplicaciones/panel/worker.js` solo sirve los assets estaticos desde el binding `ASSETS`; no contiene secretos ni logica de backend.
 
+Ademas, `wrangler.json` ejecuta `npm run panel:build` mediante `build.command` antes
+de validar y publicar los assets. Esto permite que el comando de despliegue funcione
+en un contenedor limpio aunque Cloudflare omita su paso de compilacion independiente.
+
 ### Pagina publica en Cloudflare Pages
 
 Crear otro proyecto Pages conectado al mismo repo.

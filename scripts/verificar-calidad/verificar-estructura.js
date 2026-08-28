@@ -117,7 +117,7 @@ for (const requerido of ["VITE_API_URL", "VITE_SUPABASE_URL", "VITE_SUPABASE_ANO
   }
 }
 
-for (const requerido of ["presentacion-mr-robot-panel", "\"main\": \"./aplicaciones/panel/worker.js\"", "\"assets\"", "\"binding\": \"ASSETS\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
+for (const requerido of ["presentacion-mr-robot-panel", "\"main\": \"./aplicaciones/panel/worker.js\"", "\"build\"", "\"command\": \"npm run panel:build\"", "\"assets\"", "\"binding\": \"ASSETS\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
   if (!configuracionPanel.includes(requerido)) {
     errores.push(`wrangler.json no documenta configuracion estatica del panel: ${requerido}`);
   }
