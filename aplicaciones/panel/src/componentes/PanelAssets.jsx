@@ -6,7 +6,7 @@ import { CampoTexto } from "./CampoTexto.jsx";
 import { registrarAssetDesdeUrl, subirImagenCloudinary } from "../servicios/servicioAssetsPanel.js";
 import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 
-export function PanelAssets({ sesion, presentacion, ayudas }) {
+export function PanelAssets({ sesion, presentacion, ayudas, onAssetProcesado }) {
   const [tipo, setTipo] = useState("captura_proyecto");
   const [archivo, setArchivo] = useState(null);
   const [urlPublica, setUrlPublica] = useState("");
@@ -14,6 +14,9 @@ export function PanelAssets({ sesion, presentacion, ayudas }) {
   async function manejarSubida() {
     try {
       const resultado = await subirImagenCloudinary({ sesion, presentacion, archivo, tipo });
+      if (resultado.asset) {
+        onAssetProcesado?.(resultado.asset);
+      }
       await mostrarOperacionExitosa({
         titulo: "Asset procesado",
         mensaje: resultado.mensaje,
@@ -45,6 +48,10 @@ export function PanelAssets({ sesion, presentacion, ayudas }) {
           alto: 1
         }
       });
+
+      if (resultado.asset) {
+        onAssetProcesado?.(resultado.asset);
+      }
 
       await mostrarOperacionExitosa({
         titulo: "Asset registrado",
@@ -145,4 +152,3 @@ function obtenerMime(url) {
 
   return mime[formato] || "image/webp";
 }
-

@@ -2,10 +2,11 @@ import { Maximize2, Play, Volume2 } from "lucide-react";
 import { obtenerEtiquetaFormato, obtenerResolucionFormato } from "../utilidades/formatos.js";
 import { AyudaCampo } from "./AyudaCampo.jsx";
 
-export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas }) {
+export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas, assets = [] }) {
   const fondoA = oscurecer(presentacion.colorPrimario, 0.24);
   const fondoB = oscurecer(presentacion.colorSecundario, 0.2);
   const duracionEstimada = calcularDuracionEstimada(seccionesActivas, presentacion.duracionEstimada);
+  const logo = obtenerAssetPrincipal(assets, "logo");
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-panel">
@@ -29,9 +30,17 @@ export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas }) {
             }}
           />
           <div className="relative text-center">
-            <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-md border border-white/30 text-3xl text-white">
-              MR
-            </div>
+            {logo ? (
+              <img
+                src={logo.urlPublica}
+                alt="Logo principal"
+                className="mx-auto mb-5 h-24 w-24 rounded-md border border-white/30 bg-white/90 object-contain p-2"
+              />
+            ) : (
+              <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-md border border-white/30 text-3xl text-white">
+                MR
+              </div>
+            )}
             <p className="text-3xl font-black tracking-wide" style={{ color: presentacion.colorPrimario }}>
               MR ROBOT
             </p>
@@ -71,6 +80,12 @@ export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas }) {
       </dl>
     </section>
   );
+}
+
+function obtenerAssetPrincipal(assets, tipo) {
+  return assets
+    .filter((asset) => asset.tipo === tipo && asset.urlPublica)
+    .sort((a, b) => String(b.fechaActualizacion || "").localeCompare(String(a.fechaActualizacion || "")))[0];
 }
 
 function calcularDuracionEstimada(secciones, respaldo) {

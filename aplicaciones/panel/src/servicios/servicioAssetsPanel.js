@@ -1,5 +1,17 @@
 import { solicitarApi } from "./servicioApi.js";
 
+export async function listarAssetsPanel({ sesion, presentacionId }) {
+  if (sesion.modoDemo || !presentacionId) {
+    return [];
+  }
+
+  const respuesta = await solicitarApi(`/asset?presentacionId=${encodeURIComponent(presentacionId)}`, {
+    token: sesion.token
+  });
+
+  return (respuesta.datos || []).map(convertirAssetDesdeApi);
+}
+
 export async function subirImagenCloudinary({ sesion, presentacion, archivo, tipo }) {
   if (sesion.modoDemo) {
     return {
@@ -60,7 +72,7 @@ export async function subirImagenCloudinary({ sesion, presentacion, archivo, tip
   return {
     modo: "cloudinary",
     mensaje: "Imagen subida y registrada correctamente.",
-    asset: registro.datos
+    asset: convertirAssetDesdeApi(registro.datos)
   };
 }
 
@@ -95,7 +107,7 @@ export async function registrarAssetDesdeUrl({ sesion, presentacion, datos }) {
   return {
     modo: "api",
     mensaje: "Asset registrado correctamente.",
-    asset: registro.datos
+    asset: convertirAssetDesdeApi(registro.datos)
   };
 }
 
@@ -141,4 +153,21 @@ function crearUrlOptimizadaCloudinary(url) {
   }
 
   return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}
+
+function convertirAssetDesdeApi(datos) {
+  return {
+    id: datos.id,
+    presentacionId: datos.presentacion_id,
+    tipo: datos.tipo,
+    proveedor: datos.proveedor,
+    urlPublica: datos.url_publica,
+    rutaStorage: datos.ruta_storage,
+    formato: datos.formato,
+    mimeType: datos.mime_type,
+    tamanoBytes: datos.tamano_bytes,
+    ancho: datos.ancho,
+    alto: datos.alto,
+    fechaActualizacion: datos.fecha_actualizacion
+  };
 }

@@ -20,6 +20,7 @@ import {
 } from "../datos/datosIniciales.js";
 import { iniciarSesion } from "../servicios/servicioAutenticacion.js";
 import { cargarBorrador, guardarBorrador, solicitarRenderPanel } from "../servicios/servicioEditorPresentacion.js";
+import { listarAssetsPanel } from "../servicios/servicioAssetsPanel.js";
 import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 import { LoginPanel } from "./LoginPanel.jsx";
 
@@ -31,6 +32,7 @@ export function AplicacionPanel() {
   const [integrantes, setIntegrantes] = useState(integrantesIniciales);
   const [clientes, setClientes] = useState(clientesIniciales);
   const [proyectos, setProyectos] = useState(proyectosIniciales);
+  const [assets, setAssets] = useState([]);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(false);
   const [seccionActiva, setSeccionActiva] = useState("presentacion");
@@ -78,6 +80,13 @@ export function AplicacionPanel() {
           setIntegrantes(datos.integrantes?.length ? datos.integrantes : integrantesIniciales);
           setClientes(datos.clientes?.length ? datos.clientes : clientesIniciales);
           setProyectos(datos.proyectos?.length ? datos.proyectos : proyectosIniciales);
+
+          if (datos.presentacion?.id) {
+            const assetsCargados = await listarAssetsPanel({ sesion, presentacionId: datos.presentacion.id });
+            if (!cancelado) {
+              setAssets(assetsCargados);
+            }
+          }
         }
       } catch (error) {
         if (!cancelado) {
@@ -166,6 +175,10 @@ export function AplicacionPanel() {
     });
   }
 
+  function agregarAssetProcesado(asset) {
+    setAssets((actuales) => [asset, ...actuales.filter((item) => item.id !== asset.id)]);
+  }
+
   if (!sesion) {
     return (
       <>
@@ -245,7 +258,12 @@ export function AplicacionPanel() {
               <PanelConexiones sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
             </section>
             <section id="seccion-medios" className="scroll-mt-24">
-              <PanelAssets sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
+              <PanelAssets
+                sesion={sesion}
+                presentacion={presentacion}
+                ayudas={ayudasIniciales}
+                onAssetProcesado={agregarAssetProcesado}
+              />
             </section>
             <section id="seccion-biblioteca" className="scroll-mt-24">
               <PanelContenidoEditable
@@ -281,6 +299,7 @@ export function AplicacionPanel() {
                 presentacion={presentacion}
                 seccionesActivas={seccionesActivas}
                 ayudas={ayudasIniciales}
+                assets={assets}
               />
             </section>
             <section id="seccion-narraciones" className="scroll-mt-24">
