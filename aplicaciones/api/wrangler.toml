@@ -2,6 +2,7 @@ name = "presentacion-mr-robot-api"
 main = "src/index.js"
 compatibility_date = "2026-08-27"
 compatibility_flags = ["nodejs_compat"]
+keep_vars = true
 
 [vars]
 ENTORNO = "desarrollo"

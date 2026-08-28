@@ -1,8 +1,9 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "presentacion-mr-robot-panel",
+  "name": "presentacionvideo",
   "main": "./aplicaciones/panel/worker.js",
   "compatibility_date": "2026-08-27",
+  "keep_vars": true,
   "send_metrics": false,
   "build": {
     "command": "npm run panel:build"

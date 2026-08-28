@@ -120,7 +120,7 @@ for (const requerido of ["VITE_API_URL", "VITE_SUPABASE_URL", "VITE_SUPABASE_ANO
   }
 }
 
-for (const requerido of ["presentacion-mr-robot-panel", "\"main\": \"./aplicaciones/panel/worker.js\"", "\"build\"", "\"command\": \"npm run panel:build\"", "\"assets\"", "\"binding\": \"ASSETS\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
+for (const requerido of ["presentacionvideo", "\"main\": \"./aplicaciones/panel/worker.js\"", "\"keep_vars\": true", "\"build\"", "\"command\": \"npm run panel:build\"", "\"assets\"", "\"binding\": \"ASSETS\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
   if (!configuracionPanel.includes(requerido)) {
     errores.push(`wrangler.json no documenta configuracion estatica del panel: ${requerido}`);
   }
@@ -132,7 +132,7 @@ for (const prohibido of ["SUPABASE_SERVICE_ROLE_KEY", "CLOUDINARY_API_SECRET", "
   }
 }
 
-for (const requerido of ["[env.production]", "CORS_ORIGEN_PERMITIDO", "HF_TOKEN", "GITHUB_TOKEN", "GITHUB_REPOSITORIO", "RATE_LIMIT_MAXIMO", "LIMITE_CUERPO_BYTES"]) {
+for (const requerido of ["keep_vars = true", "[env.production]", "CORS_ORIGEN_PERMITIDO", "HF_TOKEN", "GITHUB_TOKEN", "GITHUB_REPOSITORIO", "RATE_LIMIT_MAXIMO", "LIMITE_CUERPO_BYTES"]) {
   if (!configuracionWorker.includes(requerido)) {
     errores.push(`wrangler.toml no documenta configuracion de produccion: ${requerido}`);
   }
