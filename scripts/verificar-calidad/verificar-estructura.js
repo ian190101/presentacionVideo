@@ -22,6 +22,7 @@ const archivosRequeridos = [
   "aplicaciones/api/src/middlewares/controlSolicitud.js",
   "aplicaciones/panel/public/_headers",
   "aplicaciones/panel/public/_redirects",
+  "aplicaciones/panel/worker.js",
   "aplicaciones/api/src/index.js",
   "aplicaciones/api/src/rutas/enrutador.js",
   "aplicaciones/api/src/rutas/rutaContenido.js",
@@ -116,7 +117,7 @@ for (const requerido of ["VITE_API_URL", "VITE_SUPABASE_URL", "VITE_SUPABASE_ANO
   }
 }
 
-for (const requerido of ["presentacion-mr-robot-panel", "\"assets\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
+for (const requerido of ["presentacion-mr-robot-panel", "\"main\": \"./aplicaciones/panel/worker.js\"", "\"assets\"", "\"binding\": \"ASSETS\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
   if (!configuracionPanel.includes(requerido)) {
     errores.push(`wrangler.json no documenta configuracion estatica del panel: ${requerido}`);
   }

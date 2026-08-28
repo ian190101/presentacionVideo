@@ -129,7 +129,9 @@ dist/panel
 
 ```json
 {
+  "main": "./aplicaciones/panel/worker.js",
   "assets": {
+    "binding": "ASSETS",
     "directory": "./dist/panel",
     "not_found_handling": "single-page-application"
   }
@@ -157,6 +159,8 @@ Root directory: /
 ```
 
 No usar un `wrangler.json` generado por Cloudflare que tenga `assets` sin `directory`. El archivo valido es el del repositorio y apunta a `./dist/panel`.
+
+El archivo `./aplicaciones/panel/worker.js` solo sirve los assets estaticos desde el binding `ASSETS`; no contiene secretos ni logica de backend.
 
 ### Pagina publica en Cloudflare Pages
 
