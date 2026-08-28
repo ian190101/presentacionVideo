@@ -1,4 +1,6 @@
-const urlApi = import.meta.env.VITE_API_URL || "http://127.0.0.1:8787";
+import { obtenerVariableEntorno } from "./servicioEntorno.js";
+
+const urlApi = normalizarUrlBase(obtenerVariableEntorno("VITE_API_URL", "http://127.0.0.1:8787"));
 
 export async function solicitarApi(ruta, opciones = {}) {
   const token = opciones.token;
@@ -23,4 +25,8 @@ export async function solicitarApi(ruta, opciones = {}) {
   }
 
   return datos;
+}
+
+function normalizarUrlBase(url) {
+  return String(url || "").replace(/\/+$/, "");
 }

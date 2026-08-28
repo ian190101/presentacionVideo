@@ -17,8 +17,7 @@ name = "presentacion-mr-robot-api"
 
 [env.production.vars]
 ENTORNO = "produccion"
-# Cambiar por la URL final de Cloudflare Pages cuando exista.
-CORS_ORIGEN_PERMITIDO = "https://presentacion-mr-robot-panel.pages.dev"
+CORS_ORIGEN_PERMITIDO = "https://presentacionvideo.ianvera395.workers.dev"
 LIMITE_CUERPO_BYTES = "1048576"
 RATE_LIMIT_MAXIMO = "120"
 RATE_LIMIT_VENTANA_MS = "60000"

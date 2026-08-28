@@ -1,7 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
+import { obtenerVariableEntorno } from "./servicioEntorno.js";
 
-const urlSupabase = import.meta.env.VITE_SUPABASE_URL;
-const claveSupabase = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const urlSupabase = obtenerVariableEntorno("VITE_SUPABASE_URL");
+const claveSupabase = obtenerVariableEntorno("VITE_SUPABASE_ANON_KEY");
 
 export const supabase = urlSupabase && claveSupabase
   ? createClient(urlSupabase, claveSupabase)
