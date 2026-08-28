@@ -125,13 +125,26 @@ npm run panel:build
 dist/panel
 ```
 
-6. Variables de entorno en Cloudflare Pages:
+6. Si Cloudflare lo despliega como Worker con Static Assets, usar el archivo raiz `wrangler.jsonc`. Este archivo ya define:
+
+```json
+{
+  "assets": {
+    "directory": "./dist/panel",
+    "not_found_handling": "single-page-application"
+  }
+}
+```
+
+7. Variables de entorno en Cloudflare Pages o en el Worker estatico del panel:
 
 ```txt
 VITE_API_URL
 VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
+
+No agregar tokens secretos del backend al panel. El panel solo recibe variables publicas `VITE_*`.
 
 ### Pagina publica en Cloudflare Pages
 

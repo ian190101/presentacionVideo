@@ -12,6 +12,7 @@ const archivosRequeridos = [
   "docs/despliegue-produccion.md",
   "docs/release-rollback.md",
   "docs/auditoria-final.md",
+  "wrangler.jsonc",
   ".github/workflows/desplegar-produccion.yml",
   ".github/workflows/renderizar-video.yml",
   ".env.example",
@@ -76,6 +77,7 @@ const workflow = readFileSync(".github/workflows/desplegar-produccion.yml", "utf
 const workflowRender = readFileSync(".github/workflows/renderizar-video.yml", "utf8");
 const ignorados = readFileSync(".gitignore", "utf8");
 const ejemploEntorno = readFileSync(".env.example", "utf8");
+const configuracionPanel = readFileSync("wrangler.jsonc", "utf8");
 const configuracionWorker = readFileSync("aplicaciones/api/wrangler.toml", "utf8");
 
 for (const nombre of nombresTablaProhibidos) {
@@ -111,6 +113,18 @@ for (const requerido of [".env", ".dev.vars", "node_modules/", "dist/"]) {
 for (const requerido of ["VITE_API_URL", "VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"]) {
   if (!ejemploEntorno.includes(requerido)) {
     errores.push(`.env.example no documenta: ${requerido}`);
+  }
+}
+
+for (const requerido of ["presentacion-mr-robot-panel", "\"assets\"", "\"directory\": \"./dist/panel\"", "single-page-application"]) {
+  if (!configuracionPanel.includes(requerido)) {
+    errores.push(`wrangler.jsonc no documenta configuracion estatica del panel: ${requerido}`);
+  }
+}
+
+for (const prohibido of ["SUPABASE_SERVICE_ROLE_KEY", "CLOUDINARY_API_SECRET", "HF_TOKEN", "CLOUDFLARE_API_TOKEN"]) {
+  if (configuracionPanel.includes(prohibido)) {
+    errores.push(`wrangler.jsonc del panel no debe contener secretos: ${prohibido}`);
   }
 }
 
