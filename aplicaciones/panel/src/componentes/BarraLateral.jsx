@@ -13,18 +13,23 @@ import {
 } from "lucide-react";
 
 const opciones = [
-  ["Presentacion", Home],
-  ["Secciones", FolderKanban],
-  ["Biblioteca", Archive],
-  ["Medios", Image],
-  ["Narraciones", Mic],
-  ["Videos", FileVideo],
-  ["Usuarios", Users],
-  ["Auditoria", ShieldCheck],
-  ["Ajustes", Settings]
+  ["presentacion", "Presentacion", Home],
+  ["secciones", "Secciones", FolderKanban],
+  ["biblioteca", "Biblioteca", Archive],
+  ["medios", "Medios", Image],
+  ["narraciones", "Narraciones", Mic],
+  ["videos", "Videos", FileVideo],
+  ["usuarios", "Usuarios", Users],
+  ["auditoria", "Auditoria", ShieldCheck],
+  ["ajustes", "Ajustes", Settings]
 ];
 
-export function BarraLateral({ abierta = false, onCerrar, colorPrimario = "#d40511" }) {
+export function BarraLateral({ abierta = false, onCerrar, onNavegar, seccionActiva = "presentacion", colorPrimario = "#d40511" }) {
+  function manejarNavegacion(id) {
+    onNavegar?.(id);
+    onCerrar?.();
+  }
+
   const contenido = (
     <>
       <div className="border-b border-white/10 px-5 py-6">
@@ -50,16 +55,16 @@ export function BarraLateral({ abierta = false, onCerrar, colorPrimario = "#d405
           </button>
         </div>
       </div>
-      <nav className="flex-1 px-3 py-4">
-        {opciones.map(([texto, Icono], indice) => (
+      <nav className="px-3 py-4">
+        {opciones.map(([id, texto, Icono]) => (
           <button
             key={texto}
             type="button"
-            onClick={onCerrar}
+            onClick={() => manejarNavegacion(id)}
             className={`mb-1 flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm transition ${
-              indice === 0 ? "text-white" : "text-slate-300 hover:bg-white/8 hover:text-white"
+              seccionActiva === id ? "text-white" : "text-slate-300 hover:bg-white/8 hover:text-white"
             }`}
-            style={indice === 0 ? { backgroundColor: colorPrimario } : undefined}
+            style={seccionActiva === id ? { backgroundColor: colorPrimario } : undefined}
           >
             <Icono size={18} aria-hidden="true" />
             {texto}
@@ -80,7 +85,7 @@ export function BarraLateral({ abierta = false, onCerrar, colorPrimario = "#d405
 
   return (
     <>
-      <aside className="hidden min-h-screen w-64 shrink-0 bg-robot-tinta text-white lg:flex lg:flex-col">
+      <aside className="hidden w-64 shrink-0 self-start bg-robot-tinta text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
         {contenido}
       </aside>
       {abierta && (

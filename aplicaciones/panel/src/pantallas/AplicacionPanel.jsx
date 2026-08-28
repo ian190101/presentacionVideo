@@ -33,6 +33,7 @@ export function AplicacionPanel() {
   const [proyectos, setProyectos] = useState(proyectosIniciales);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(false);
+  const [seccionActiva, setSeccionActiva] = useState("presentacion");
 
   const seccionesActivas = useMemo(
     () => secciones.filter((seccion) => seccion.activaEnVideo && seccion.visibleEnPreview),
@@ -157,6 +158,14 @@ export function AplicacionPanel() {
     }
   }
 
+  function navegarASeccion(id) {
+    setSeccionActiva(id);
+    document.getElementById(`seccion-${id}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
   if (!sesion) {
     return (
       <>
@@ -175,6 +184,8 @@ export function AplicacionPanel() {
       <BarraLateral
         abierta={menuAbierto}
         onCerrar={() => setMenuAbierto(false)}
+        onNavegar={navegarASeccion}
+        seccionActiva={seccionActiva}
         colorPrimario={presentacion.colorPrimario}
       />
       <div className="min-w-0 flex-1">
@@ -221,46 +232,66 @@ export function AplicacionPanel() {
 
         <main className="grid gap-5 p-4 xl:grid-cols-[minmax(0,1fr)_410px]">
           <div className="grid min-w-0 gap-5">
-            <FormularioPresentacion
-              presentacion={presentacion}
-              setPresentacion={setPresentacion}
-              ayudas={ayudasIniciales}
-              onGuardar={manejarGuardar}
-              onGenerarVideo={manejarGenerarVideo}
-            />
-            <PanelConexiones sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
-            <PanelAssets sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
-            <PanelContenidoEditable
-              clientes={clientes}
-              setClientes={setClientes}
-              proyectos={proyectos}
-              setProyectos={setProyectos}
-              integrantes={integrantes}
-              setIntegrantes={setIntegrantes}
-              ayudas={ayudasIniciales}
-            />
-            <ListaSecciones
-              secciones={secciones}
-              setSecciones={setSecciones}
-              ayudas={ayudasIniciales}
-              colorPrimario={presentacion.colorPrimario}
-              colorSecundario={presentacion.colorSecundario}
-            />
-            <EquipoResumen integrantes={integrantes} colorSecundario={presentacion.colorSecundario} />
+            <section id="seccion-presentacion" className="scroll-mt-24">
+              <FormularioPresentacion
+                presentacion={presentacion}
+                setPresentacion={setPresentacion}
+                ayudas={ayudasIniciales}
+                onGuardar={manejarGuardar}
+                onGenerarVideo={manejarGenerarVideo}
+              />
+            </section>
+            <section id="seccion-ajustes" className="scroll-mt-24">
+              <PanelConexiones sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
+            </section>
+            <section id="seccion-medios" className="scroll-mt-24">
+              <PanelAssets sesion={sesion} presentacion={presentacion} ayudas={ayudasIniciales} />
+            </section>
+            <section id="seccion-biblioteca" className="scroll-mt-24">
+              <PanelContenidoEditable
+                clientes={clientes}
+                setClientes={setClientes}
+                proyectos={proyectos}
+                setProyectos={setProyectos}
+                integrantes={integrantes}
+                setIntegrantes={setIntegrantes}
+                ayudas={ayudasIniciales}
+              />
+            </section>
+            <section id="seccion-secciones" className="scroll-mt-24">
+              <ListaSecciones
+                secciones={secciones}
+                setSecciones={setSecciones}
+                ayudas={ayudasIniciales}
+                colorPrimario={presentacion.colorPrimario}
+                colorSecundario={presentacion.colorSecundario}
+              />
+            </section>
+            <section id="seccion-usuarios" className="scroll-mt-24">
+              <EquipoResumen integrantes={integrantes} colorSecundario={presentacion.colorSecundario} />
+            </section>
+            <section id="seccion-auditoria" className="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
+              <h2 className="text-lg font-bold text-slate-950">Auditoria</h2>
+              <p className="mt-1 text-sm text-slate-500">Los eventos criticos se registraran aqui cuando la API tenga auditoria activa.</p>
+            </section>
           </div>
           <aside className="grid h-fit gap-4 xl:sticky xl:top-20">
-            <VistaPreviaVideo
-              presentacion={presentacion}
-              seccionesActivas={seccionesActivas}
-              ayudas={ayudasIniciales}
-            />
-            <PanelEstado
-              sesion={sesion}
-              presentacion={presentacion}
-              seccionesActivas={seccionesActivas}
-              ayudas={ayudasIniciales}
-              onGenerarVideo={manejarGenerarVideo}
-            />
+            <section id="seccion-videos" className="scroll-mt-24">
+              <VistaPreviaVideo
+                presentacion={presentacion}
+                seccionesActivas={seccionesActivas}
+                ayudas={ayudasIniciales}
+              />
+            </section>
+            <section id="seccion-narraciones" className="scroll-mt-24">
+              <PanelEstado
+                sesion={sesion}
+                presentacion={presentacion}
+                seccionesActivas={seccionesActivas}
+                ayudas={ayudasIniciales}
+                onGenerarVideo={manejarGenerarVideo}
+              />
+            </section>
             <BotonIcono icono={Save} variante="tenue" onClick={manejarGuardar}>Guardar borrador</BotonIcono>
           </aside>
         </main>

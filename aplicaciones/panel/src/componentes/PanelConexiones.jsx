@@ -70,7 +70,7 @@ export function PanelConexiones({ sesion, presentacion, ayudas }) {
           <AyudaCampo ayuda={ayudas.clavesApi} />
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Cambia credenciales sin tocar codigo. Las claves secretas deben probarse desde backend seguro.
+          Si los campos quedan vacios, la prueba usa las variables configuradas en Cloudflare para este Worker.
         </p>
       </div>
 
