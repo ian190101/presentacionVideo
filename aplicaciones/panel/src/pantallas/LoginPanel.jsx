@@ -22,7 +22,7 @@ export function LoginPanel({ onIngresar, logoUrl }) {
             <img
               src={logoUrl}
               alt="Logo de Mr Robot Bolivia"
-              className="mx-auto mb-4 h-16 w-16 rounded-md border border-slate-200 bg-white object-contain p-2"
+              className="mx-auto mb-4 h-20 w-20 object-contain"
             />
           ) : (
             <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-robot-tinta text-lg font-black text-white">

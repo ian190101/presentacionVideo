@@ -224,6 +224,7 @@ export function AplicacionPanel() {
         onNavegar={navegarASeccion}
         seccionActiva={seccionActiva}
         colorPrimario={presentacion.colorPrimario}
+        logoUrl={logoPublicoUrl}
       />
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">

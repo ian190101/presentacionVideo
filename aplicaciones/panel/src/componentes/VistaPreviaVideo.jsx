@@ -34,7 +34,7 @@ export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas, asset
               <img
                 src={logo.urlPublica}
                 alt="Logo principal"
-                className="mx-auto mb-5 h-24 w-24 rounded-md border border-white/30 bg-white/90 object-contain p-2"
+                className="mx-auto mb-5 h-28 w-28 object-contain"
               />
             ) : (
               <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-md border border-white/30 text-3xl text-white">

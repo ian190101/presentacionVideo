@@ -24,7 +24,14 @@ const opciones = [
   ["ajustes", "Ajustes", Settings]
 ];
 
-export function BarraLateral({ abierta = false, onCerrar, onNavegar, seccionActiva = "presentacion", colorPrimario = "#d40511" }) {
+export function BarraLateral({
+  abierta = false,
+  onCerrar,
+  onNavegar,
+  seccionActiva = "presentacion",
+  colorPrimario = "#d40511",
+  logoUrl = ""
+}) {
   function manejarNavegacion(id) {
     onNavegar?.(id);
     onCerrar?.();
@@ -35,9 +42,17 @@ export function BarraLateral({ abierta = false, onCerrar, onNavegar, seccionActi
       <div className="border-b border-white/10 px-5 py-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-md border border-white/20 bg-white/5 text-xl">
-              MR
-            </div>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Logo de Mr Robot Bolivia"
+                className="h-11 w-11 object-contain"
+              />
+            ) : (
+              <div className="grid h-11 w-11 place-items-center rounded-md border border-white/20 bg-white/5 text-xl">
+                MR
+              </div>
+            )}
             <div>
               <p className="text-lg font-black tracking-wide" style={{ color: colorPrimario }}>
                 MR ROBOT
