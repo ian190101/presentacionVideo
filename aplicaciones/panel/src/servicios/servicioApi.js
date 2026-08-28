@@ -2,6 +2,10 @@ import { obtenerVariableEntorno } from "./servicioEntorno.js";
 
 const urlApi = normalizarUrlBase(obtenerVariableEntorno("VITE_API_URL", "http://127.0.0.1:8787"));
 
+export function obtenerUrlApi() {
+  return urlApi;
+}
+
 export async function solicitarApi(ruta, opciones = {}) {
   const token = opciones.token;
   const cabeceras = {

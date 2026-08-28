@@ -148,11 +148,17 @@ async function registrarAssetSubido({ sesion, presentacion, tipo, subida, archiv
 }
 
 function crearUrlOptimizadaCloudinary(url) {
-  if (!url || !url.includes("/upload/")) {
+  if (!url || !url.includes("res.cloudinary.com") || !url.includes("/upload/")) {
     return url;
   }
 
-  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+  const transformacion = "f_avif,q_auto:best";
+
+  if (url.includes(`/upload/${transformacion}/`)) {
+    return url;
+  }
+
+  return url.replace("/upload/", `/upload/${transformacion}/`);
 }
 
 function convertirAssetDesdeApi(datos) {
@@ -161,7 +167,7 @@ function convertirAssetDesdeApi(datos) {
     presentacionId: datos.presentacion_id,
     tipo: datos.tipo,
     proveedor: datos.proveedor,
-    urlPublica: datos.url_publica,
+    urlPublica: crearUrlOptimizadaCloudinary(datos.url_publica),
     rutaStorage: datos.ruta_storage,
     formato: datos.formato,
     mimeType: datos.mime_type,

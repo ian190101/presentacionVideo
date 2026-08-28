@@ -2,7 +2,7 @@ import { Lock, LogIn } from "lucide-react";
 import { useState } from "react";
 import { BotonIcono } from "../componentes/BotonIcono.jsx";
 
-export function LoginPanel({ onIngresar }) {
+export function LoginPanel({ onIngresar, logoUrl }) {
   const [correo, setCorreo] = useState("admin@mrrobot.bo");
   const [contrasena, setContrasena] = useState("demo-seguro");
 
@@ -18,9 +18,17 @@ export function LoginPanel({ onIngresar }) {
         className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-panel"
       >
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-robot-tinta text-lg font-black text-white">
-            MR
-          </div>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo de Mr Robot Bolivia"
+              className="mx-auto mb-4 h-16 w-16 rounded-md border border-slate-200 bg-white object-contain p-2"
+            />
+          ) : (
+            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-robot-tinta text-lg font-black text-white">
+              MR
+            </div>
+          )}
           <h1 className="text-2xl font-black text-slate-950">Panel de presentacion</h1>
           <p className="mt-2 text-sm text-slate-500">
             Ingresa para editar contenido, narracion, assets y video.

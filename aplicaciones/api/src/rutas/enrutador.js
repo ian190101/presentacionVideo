@@ -4,6 +4,7 @@ import { manejarRutaContenido } from "./rutaContenido.js";
 import { manejarRutaIntegracion } from "./rutaIntegracion.js";
 import { manejarRutaNarracion } from "./rutaNarracion.js";
 import { manejarRutaPresentacion } from "./rutaPresentacion.js";
+import { manejarRutaPublica } from "./rutaPublica.js";
 import { manejarRutaRender } from "./rutaRender.js";
 import { manejarRutaSalud } from "./rutaSalud.js";
 import { responderError } from "../servicios/servicioRespuesta.js";
@@ -14,6 +15,10 @@ export async function enrutarSolicitud(solicitud, entorno, contexto) {
 
   if (ruta === "/salud") {
     return manejarRutaSalud();
+  }
+
+  if (ruta.startsWith("/publico")) {
+    return manejarRutaPublica(solicitud, entorno, contexto);
   }
 
   if (ruta.startsWith("/ayuda")) {

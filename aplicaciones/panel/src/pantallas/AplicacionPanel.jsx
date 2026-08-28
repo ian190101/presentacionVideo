@@ -21,6 +21,7 @@ import {
 import { iniciarSesion } from "../servicios/servicioAutenticacion.js";
 import { cargarBorrador, guardarBorrador, solicitarRenderPanel } from "../servicios/servicioEditorPresentacion.js";
 import { listarAssetsPanel } from "../servicios/servicioAssetsPanel.js";
+import { obtenerLogoPublico } from "../servicios/servicioLogoPublico.js";
 import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 import { LoginPanel } from "./LoginPanel.jsx";
 
@@ -33,6 +34,7 @@ export function AplicacionPanel() {
   const [clientes, setClientes] = useState(clientesIniciales);
   const [proyectos, setProyectos] = useState(proyectosIniciales);
   const [assets, setAssets] = useState([]);
+  const [logoPublicoUrl, setLogoPublicoUrl] = useState("");
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(false);
   const [seccionActiva, setSeccionActiva] = useState("presentacion");
@@ -41,6 +43,24 @@ export function AplicacionPanel() {
     () => secciones.filter((seccion) => seccion.activaEnVideo && seccion.visibleEnPreview),
     [secciones]
   );
+
+  useEffect(() => {
+    let cancelado = false;
+
+    async function cargarLogoPublico() {
+      const logoUrl = await obtenerLogoPublico();
+
+      if (!cancelado && logoUrl) {
+        setLogoPublicoUrl(logoUrl);
+      }
+    }
+
+    cargarLogoPublico();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
 
   async function manejarIngreso(credenciales) {
     try {
@@ -177,12 +197,16 @@ export function AplicacionPanel() {
 
   function agregarAssetProcesado(asset) {
     setAssets((actuales) => [asset, ...actuales.filter((item) => item.id !== asset.id)]);
+
+    if (asset.tipo === "logo" && asset.urlPublica) {
+      setLogoPublicoUrl(asset.urlPublica);
+    }
   }
 
   if (!sesion) {
     return (
       <>
-        <LoginPanel onIngresar={manejarIngreso} />
+        <LoginPanel onIngresar={manejarIngreso} logoUrl={logoPublicoUrl} />
         {mensajeSesion && (
           <div className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-slate-950 px-4 py-2 text-sm text-white shadow-panel">
             {mensajeSesion}
