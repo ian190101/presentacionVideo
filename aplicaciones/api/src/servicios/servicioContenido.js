@@ -120,12 +120,14 @@ export async function obtenerContenido({ entorno, token, entidad, id }) {
 
 export async function crearContenido({ entorno, token, entidad, datos }) {
   const configuracion = obtenerConfiguracion(entidad);
-  const respuesta = await consultarSupabase({
+  const cuerpo = convertirASupabase(configuracion, datos);
+  const respuesta = await consultarConCompatibilidadProyecto({
     entorno,
     token,
+    entidad,
     ruta: configuracion.tabla,
     metodo: "POST",
-    cuerpo: convertirASupabase(configuracion, datos)
+    cuerpo
   });
 
   return respuesta[0];
@@ -133,12 +135,14 @@ export async function crearContenido({ entorno, token, entidad, datos }) {
 
 export async function actualizarContenido({ entorno, token, entidad, id, datos }) {
   const configuracion = obtenerConfiguracion(entidad);
-  const respuesta = await consultarSupabase({
+  const cuerpo = convertirASupabase(configuracion, datos);
+  const respuesta = await consultarConCompatibilidadProyecto({
     entorno,
     token,
+    entidad,
     ruta: `${configuracion.tabla}?id=eq.${encodeURIComponent(id)}`,
     metodo: "PATCH",
-    cuerpo: convertirASupabase(configuracion, datos)
+    cuerpo
   });
 
   return respuesta[0];
@@ -184,4 +188,34 @@ function convertirASupabase(configuracion, datos) {
 
 function convertirSnakeCase(campo) {
   return campo.replace(/[A-Z]/g, (letra) => `_${letra.toLowerCase()}`);
+}
+
+async function consultarConCompatibilidadProyecto({ entorno, token, entidad, ruta, metodo, cuerpo }) {
+  try {
+    return await consultarSupabase({ entorno, token, ruta, metodo, cuerpo });
+  } catch (error) {
+    if (!(await requiereCompatibilidadConfiguracionProyecto({ entidad, cuerpo, error }))) {
+      throw error;
+    }
+
+    const cuerpoCompatible = { ...cuerpo };
+    delete cuerpoCompatible.configuracion;
+
+    return consultarSupabase({ entorno, token, ruta, metodo, cuerpo: cuerpoCompatible });
+  }
+}
+
+async function requiereCompatibilidadConfiguracionProyecto({ entidad, cuerpo, error }) {
+  if (entidad !== "proyecto" || !Object.prototype.hasOwnProperty.call(cuerpo, "configuracion")) {
+    return false;
+  }
+
+  if (!(error instanceof Response)) {
+    return false;
+  }
+
+  const datos = await error.clone().json().catch(() => null);
+  const detalles = datos?.error?.detalles;
+
+  return detalles?.code === "PGRST204" && String(detalles?.message || "").includes("'configuracion'");
 }
