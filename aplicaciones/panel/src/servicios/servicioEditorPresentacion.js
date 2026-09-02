@@ -303,7 +303,9 @@ function convertirPresentacionParaApi(presentacion) {
     descripcion: presentacion.descripcion,
     formatoPreferido: presentacion.formatoPreferido,
     configuracionTema: {
-      calidadRender: presentacion.calidadRender || "rapida"
+      calidadRender: presentacion.calidadRender || "rapida",
+      vozNarracion: presentacion.vozNarracion || "Sofia natural",
+      velocidadNarracion: presentacion.velocidadNarracion || "1.0x normal"
     },
     colorPrimario: presentacion.colorPrimario,
     colorSecundario: presentacion.colorSecundario
@@ -378,8 +380,8 @@ function convertirPresentacionDesdeApi(datos) {
     calidadRender: datos.configuracion_tema?.calidadRender || "rapida",
     colorPrimario: datos.color_principal || "#d40511",
     colorSecundario: datos.color_secundario || "#22c7dd",
-    vozNarracion: "Sofia natural",
-    velocidadNarracion: "1.0x normal",
+    vozNarracion: datos.configuracion_tema?.vozNarracion || "Sofia natural",
+    velocidadNarracion: datos.configuracion_tema?.velocidadNarracion || "1.0x normal",
     duracionEstimada: "03:40",
     estadoNarracion: "pendiente",
     estadoRender: "pendiente"

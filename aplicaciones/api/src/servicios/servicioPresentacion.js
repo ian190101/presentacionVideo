@@ -25,6 +25,8 @@ export async function crearPresentacion({ entorno, token, usuario, datos }) {
     empresa_objetivo: datos.empresaObjetivo,
     industria_objetivo: datos.industriaObjetivo || null,
     formato_preferido: datos.formatoPreferido || "horizontal",
+    color_principal: datos.colorPrimario || null,
+    color_secundario: datos.colorSecundario || null,
     configuracion_tema: datos.configuracionTema || {},
     creado_por: usuario.id
   };

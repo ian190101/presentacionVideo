@@ -10,6 +10,8 @@ export function validarNuevaPresentacion(entrada) {
     empresaObjetivo: limpiarTexto(entrada?.empresaObjetivo),
     industriaObjetivo: limpiarTexto(entrada?.industriaObjetivo),
     formatoPreferido: limpiarTexto(entrada?.formatoPreferido || "horizontal"),
+    colorPrimario: limpiarTexto(entrada?.colorPrimario),
+    colorSecundario: limpiarTexto(entrada?.colorSecundario),
     configuracionTema: entrada?.configuracionTema || {}
   };
 
