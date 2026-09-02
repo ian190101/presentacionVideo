@@ -183,7 +183,7 @@ export function AplicacionPanel() {
       await mostrarOperacionExitosa({
         titulo: "Render solicitado",
         mensaje: resultado.mensaje,
-        detalles: `Modo: ${resultado.modo}`,
+        detalles: crearDetalleRender(resultado),
         colores: {
           colorPrimario: presentacion.colorPrimario,
           colorSecundario: presentacion.colorSecundario
@@ -199,6 +199,26 @@ export function AplicacionPanel() {
         }
       });
     }
+  }
+
+  function crearDetalleRender(resultado) {
+    const datos = resultado.datos || {};
+    const workflow = datos.workflow || {};
+    const partes = [`Modo: ${resultado.modo}`];
+
+    if (workflow.urlRun) {
+      partes.push(`Run: ${workflow.urlRun}`);
+    }
+
+    if (workflow.urlWorkflow) {
+      partes.push(`Workflow: ${workflow.urlWorkflow}`);
+    }
+
+    if (workflow.mensajeDescarga) {
+      partes.push(workflow.mensajeDescarga);
+    }
+
+    return partes.join("\n");
   }
 
   function navegarASeccion(id) {

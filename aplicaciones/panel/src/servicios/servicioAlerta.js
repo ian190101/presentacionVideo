@@ -57,7 +57,7 @@ export function mostrarErrorOperacion({ titulo = "No se pudo completar", error, 
     title: titulo,
     html: crearHtmlError({
       codigo: error?.codigo || "error_operacion",
-      errorTecnico: error?.stack || error?.message || "Sin detalle tecnico.",
+      errorTecnico: crearDetalleTecnico(error),
       mensaje: error?.message || "La operacion fallo.",
       soluciones: [
         "Verifica los datos obligatorios.",
@@ -108,10 +108,22 @@ function crearHtmlError(error) {
 }
 
 function escaparHtml(valor) {
-  return valor
+  return String(valor || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function crearDetalleTecnico(error) {
+  if (!error) {
+    return "Sin detalle tecnico.";
+  }
+
+  const detalles = error.detalles
+    ? `\n\nDetalles del servidor:\n${typeof error.detalles === "string" ? error.detalles : JSON.stringify(error.detalles, null, 2)}`
+    : "";
+
+  return `${error.stack || error.message || "Sin detalle tecnico."}${detalles}`;
 }
