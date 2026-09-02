@@ -1,5 +1,7 @@
 import { estaEnLista, limpiarTexto, textoEntre } from "./validacionComun.js";
 
+const camposUuidOpcionales = new Set(["clienteId", "assetLogoId", "assetCapturaPrincipalId", "assetFotoId"]);
+
 const configuracionEntidad = {
   seccion: {
     camposPermitidos: ["presentacionId", "tipo", "tituloInterno", "orden", "activaEnVideo", "visibleEnPreview", "duracionSugeridaSegundos", "textoNarracion", "vozNarracion", "animacionEntrada", "animacionSalida", "configuracion"],
@@ -103,6 +105,10 @@ function validarReglasEntidad({ entidad, datos, errores, configuracion }) {
 }
 
 function normalizarCampo(campo, valor) {
+  if (camposUuidOpcionales.has(campo)) {
+    return normalizarUuidOpcional(valor);
+  }
+
   if (["orden", "duracionSugeridaSegundos", "nivelVisual"].includes(campo)) {
     return Number(valor);
   }
@@ -120,4 +126,14 @@ function normalizarCampo(campo, valor) {
   }
 
   return limpiarTexto(valor);
+}
+
+function normalizarUuidOpcional(valor) {
+  const texto = limpiarTexto(typeof valor === "string" ? valor : "");
+
+  if (!texto || texto === "\"\"" || texto === "null" || texto === "undefined") {
+    return null;
+  }
+
+  return texto;
 }

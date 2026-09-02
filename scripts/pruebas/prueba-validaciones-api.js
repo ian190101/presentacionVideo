@@ -30,10 +30,22 @@ assert.equal(actualizacionValida.valida, true);
 const clienteValido = validarContenidoEntidad("cliente", {
   presentacionId: "presentacion-demo",
   nombre: "FIEA",
-  tipoCliente: "internacional"
+  tipoCliente: "internacional",
+  assetLogoId: null
 });
 
 assert.equal(clienteValido.valida, true);
+assert.equal(clienteValido.datos.assetLogoId, null);
+
+const proyectoConCapturaVacia = validarContenidoEntidad("proyecto", {
+  presentacionId: "presentacion-demo",
+  nombre: "Proyecto demo",
+  tipoSolucion: "web",
+  assetCapturaPrincipalId: ""
+});
+
+assert.equal(proyectoConCapturaVacia.valida, true);
+assert.equal(proyectoConCapturaVacia.datos.assetCapturaPrincipalId, null);
 
 const clienteInvalido = validarContenidoEntidad("cliente", {
   presentacionId: "presentacion-demo",

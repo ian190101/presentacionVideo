@@ -359,7 +359,7 @@ function convertirIntegranteParaApi(integrante) {
     resumenProfesional: integrante.resumenProfesional || integrante.especialidad,
     experiencia: integrante.experiencia || "",
     cvDetalle: integrante.cvDetalle || crearCvDetalleDesdeIntegrante(integrante),
-    assetFotoId: integrante.assetFotoId || null,
+    assetFotoId: normalizarIdOpcional(integrante.assetFotoId),
     orden: integrante.orden || 0,
     activo: true
   };
@@ -387,7 +387,7 @@ function convertirProyectoParaApi(proyecto) {
     descripcion: proyecto.descripcion,
     stackUsado: proyecto.stackUsado,
     resultadoImpacto: proyecto.resultadoImpacto,
-    assetCapturaPrincipalId: proyecto.assetCapturaPrincipalId || null,
+    assetCapturaPrincipalId: normalizarIdOpcional(proyecto.assetCapturaPrincipalId),
     configuracion: {
       mostrarDescripcionCaptura: proyecto.mostrarDescripcionCaptura !== false,
       descripcionCaptura: proyecto.descripcionCaptura || ""
@@ -491,6 +491,11 @@ function esUuid(valor) {
 
 function normalizarNombreClave(valor) {
   return String(valor || "").trim().toLowerCase();
+}
+
+function normalizarIdOpcional(valor) {
+  const texto = String(valor || "").trim();
+  return texto && texto !== "\"\"" && texto !== "null" && texto !== "undefined" ? texto : null;
 }
 
 function crearCvDetalleDesdeIntegrante(integrante) {
