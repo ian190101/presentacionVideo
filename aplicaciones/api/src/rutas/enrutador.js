@@ -1,5 +1,6 @@
 import { manejarRutaAyuda } from "./rutaAyuda.js";
 import { manejarRutaAsset } from "./rutaAsset.js";
+import { manejarRutaAutenticacion } from "./rutaAutenticacion.js";
 import { manejarRutaAuditoria } from "./rutaAuditoria.js";
 import { manejarRutaContenido } from "./rutaContenido.js";
 import { manejarRutaIntegracion } from "./rutaIntegracion.js";
@@ -20,6 +21,10 @@ export async function enrutarSolicitud(solicitud, entorno, contexto) {
 
   if (ruta.startsWith("/publico")) {
     return manejarRutaPublica(solicitud, entorno, contexto);
+  }
+
+  if (ruta.startsWith("/autenticacion")) {
+    return manejarRutaAutenticacion(solicitud, entorno, contexto);
   }
 
   if (ruta.startsWith("/ayuda")) {

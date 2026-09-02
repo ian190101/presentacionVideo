@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { solicitarApi } from "./servicioApi.js";
 import { obtenerVariableEntorno } from "./servicioEntorno.js";
 
 const urlSupabase = obtenerVariableEntorno("VITE_SUPABASE_URL");
@@ -26,9 +27,12 @@ export async function iniciarSesion({ correo, contrasena }) {
     throw new Error(error.message);
   }
 
+  const perfil = await sincronizarPerfilBackend(data.session.access_token);
+
   return {
     usuario: data.user,
     token: data.session.access_token,
+    perfil,
     modoDemo: false
   };
 }
@@ -37,4 +41,13 @@ export async function cerrarSesion() {
   if (supabase) {
     await supabase.auth.signOut();
   }
+}
+
+async function sincronizarPerfilBackend(token) {
+  const respuesta = await solicitarApi("/autenticacion/perfil", {
+    metodo: "POST",
+    token
+  });
+
+  return respuesta?.datos?.perfil || null;
 }
