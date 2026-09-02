@@ -3,18 +3,21 @@ import { AyudaCampo } from "./AyudaCampo.jsx";
 import { BotonIcono } from "./BotonIcono.jsx";
 import { mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 import { generarNarracionDemoOApi } from "../servicios/servicioNarracionPanel.js";
+import { prepararTextoNarracion } from "../utilidades/narracion.js";
 
 export function PanelEstado({ sesion, presentacion, seccionesActivas = [], ayudas, onGenerarVideo }) {
   const duracionEstimada = calcularDuracionEstimada(seccionesActivas, presentacion.duracionEstimada);
+  const textoNarracion = prepararTextoNarracion(seccionesActivas);
+  const totalPalabras = contarPalabras(textoNarracion);
 
   async function generarNarracion() {
-    const texto = seccionesActivas.map((seccion) => seccion.narracion || seccion.descripcion).join(" ");
     const resultado = await generarNarracionDemoOApi({
       token: sesion.token,
       presentacionId: presentacion.id,
-      texto,
+      texto: textoNarracion,
       voz: presentacion.vozNarracion,
-      velocidad: Number.parseFloat(presentacion.velocidadNarracion) || 1
+      velocidad: Number.parseFloat(presentacion.velocidadNarracion) || 1,
+      idioma: presentacion.idiomaNarracion || "es"
     });
 
     await mostrarOperacionExitosa({
@@ -53,8 +56,17 @@ export function PanelEstado({ sesion, presentacion, seccionesActivas = [], ayuda
           ))}
         </div>
         <p className="mb-3 text-sm text-slate-600">
-          Voz: {presentacion.vozNarracion} · Velocidad: {presentacion.velocidadNarracion}
+          Idioma: {presentacion.idiomaNarracion || "es"} · Voz: {presentacion.vozNarracion} · Velocidad: {presentacion.velocidadNarracion}
         </p>
+        <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+          <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-slate-500">
+            <span>Texto preparado</span>
+            <span>{totalPalabras} palabras</span>
+          </div>
+          <p className="max-h-24 overflow-auto text-sm leading-6 text-slate-700">
+            {textoNarracion || "Sin texto de narracion disponible."}
+          </p>
+        </div>
         <BotonIcono icono={Mic} onClick={generarNarracion}>Generar narracion</BotonIcono>
       </section>
 
@@ -95,6 +107,11 @@ export function PanelEstado({ sesion, presentacion, seccionesActivas = [], ayuda
       </section>
     </div>
   );
+}
+
+function contarPalabras(texto) {
+  const coincidencias = String(texto || "").match(/[A-Za-zÀ-ÿ0-9]+(?:['-][A-Za-zÀ-ÿ0-9]+)?/g);
+  return coincidencias?.length || 0;
 }
 
 function calcularDuracionEstimada(secciones, respaldo) {

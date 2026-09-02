@@ -1,4 +1,8 @@
 import { solicitarApi } from "./servicioApi.js";
+import {
+  ajustarDuracionesSeccionesPorNarracion,
+  prepararTextoSeccionNarracion
+} from "../utilidades/narracion.js";
 
 const CLAVE_BORRADOR_LOCAL = "presentacion_mr_robot_borrador";
 
@@ -47,11 +51,20 @@ export async function cargarBorrador({ sesion, datosIniciales }) {
 }
 
 export async function guardarBorrador({ sesion, presentacion, secciones, integrantes, clientes, proyectos }) {
+  const seccionesAjustadas = ajustarDuracionesSeccionesPorNarracion(secciones, presentacion);
+
   if (sesion.modoDemo) {
-    localStorage.setItem(CLAVE_BORRADOR_LOCAL, JSON.stringify({ presentacion, secciones, integrantes, clientes, proyectos }));
+    localStorage.setItem(CLAVE_BORRADOR_LOCAL, JSON.stringify({
+      presentacion,
+      secciones: seccionesAjustadas,
+      integrantes,
+      clientes,
+      proyectos
+    }));
     return {
       modo: "local",
-      mensaje: "Presentacion guardada en este navegador."
+      mensaje: "Presentacion guardada en este navegador.",
+      secciones: seccionesAjustadas
     };
   }
 
@@ -61,7 +74,7 @@ export async function guardarBorrador({ sesion, presentacion, secciones, integra
 
   const presentacionId = presentacionGuardada.id;
 
-  for (const seccion of secciones) {
+  for (const seccion of seccionesAjustadas) {
     await guardarSeccion({ sesion, presentacionId, seccion });
   }
 
@@ -89,7 +102,8 @@ export async function guardarBorrador({ sesion, presentacion, secciones, integra
   return {
     modo: "api",
     mensaje: "Presentacion guardada en Supabase mediante la API.",
-    presentacion: convertirPresentacionDesdeApi(presentacionGuardada)
+    presentacion: convertirPresentacionDesdeApi(presentacionGuardada),
+    secciones: seccionesAjustadas
   };
 }
 
@@ -304,8 +318,10 @@ function convertirPresentacionParaApi(presentacion) {
     formatoPreferido: presentacion.formatoPreferido,
     configuracionTema: {
       calidadRender: presentacion.calidadRender || "rapida",
+      idiomaNarracion: presentacion.idiomaNarracion || "es",
       vozNarracion: presentacion.vozNarracion || "af_heart",
       velocidadNarracion: presentacion.velocidadNarracion || "1",
+      palabrasPorMinutoNarracion: Number(presentacion.palabrasPorMinutoNarracion) || 125,
       mostrarLogoEnVideo: presentacion.mostrarLogoEnVideo !== false,
       logoRadioBorde: Number(presentacion.logoRadioBorde) || 0,
       logoTamano: Number(presentacion.logoTamano) || 100,
@@ -325,7 +341,7 @@ function convertirSeccionParaApi(seccion) {
     activaEnVideo: seccion.activaEnVideo,
     visibleEnPreview: seccion.visibleEnPreview,
     duracionSugeridaSegundos: seccion.duracionSugeridaSegundos || 5,
-    textoNarracion: seccion.narracion || seccion.descripcion,
+    textoNarracion: prepararTextoSeccionNarracion(seccion),
     animacionEntrada: seccion.animacion,
     animacionSalida: "salida_suave",
     configuracion: {
@@ -391,8 +407,10 @@ function convertirPresentacionDesdeApi(datos) {
     calidadRender: datos.configuracion_tema?.calidadRender || "rapida",
     colorPrimario: datos.color_principal || "#d40511",
     colorSecundario: datos.color_secundario || "#22c7dd",
+    idiomaNarracion: datos.configuracion_tema?.idiomaNarracion || "es",
     vozNarracion: datos.configuracion_tema?.vozNarracion || "af_heart",
     velocidadNarracion: datos.configuracion_tema?.velocidadNarracion || "1",
+    palabrasPorMinutoNarracion: Number(datos.configuracion_tema?.palabrasPorMinutoNarracion) || 125,
     mostrarLogoEnVideo: datos.configuracion_tema?.mostrarLogoEnVideo !== false,
     logoRadioBorde: Number(datos.configuracion_tema?.logoRadioBorde) || 0,
     logoTamano: Number(datos.configuracion_tema?.logoTamano) || 100,

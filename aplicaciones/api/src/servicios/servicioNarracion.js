@@ -7,7 +7,8 @@ export async function generarAudioNarracion({ entorno, token, datos }) {
   const hashNarracion = await calcularHashNarracion({
     texto: datos.texto,
     voz: datos.voz,
-    velocidad: datos.velocidad
+    velocidad: datos.velocidad,
+    idioma: datos.idioma || "es"
   });
 
   const audioCacheado = await buscarAudioCacheado({ entorno, token, hashNarracion, datos });
@@ -24,7 +25,8 @@ export async function generarAudioNarracion({ entorno, token, datos }) {
     entorno,
     texto: datos.texto,
     voz: datos.voz,
-    velocidad: datos.velocidad
+    velocidad: datos.velocidad,
+    idioma: datos.idioma || "es"
   });
 
   if (!resultadoKokoro.audio || !estaConfiguradoStorageAudio(entorno) || !datos.presentacionId) {
@@ -88,6 +90,9 @@ async function guardarAudioGenerado({ entorno, token, hashNarracion, datos, audi
       mime_type: storage.mimeType,
       tamano_bytes: storage.tamanoBytes,
       hash_contenido: hashNarracion,
+      metadata: {
+        idioma: datos.idioma || "es"
+      },
       estado: "disponible"
     }
   });

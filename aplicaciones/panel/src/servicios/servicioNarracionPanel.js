@@ -1,17 +1,17 @@
 import { solicitarApi } from "./servicioApi.js";
 
-export async function generarNarracionDemoOApi({ token, presentacionId, texto, voz, velocidad }) {
+export async function generarNarracionDemoOApi({ token, presentacionId, texto, voz, velocidad, idioma }) {
   if (token && token !== "token-demo") {
     const respuesta = await solicitarApi("/narracion/generar-audio", {
       metodo: "POST",
       token,
-      cuerpo: { presentacionId, texto, voz, velocidad }
+      cuerpo: { presentacionId, texto, voz, velocidad, idioma }
     });
 
     return respuesta.datos;
   }
 
-  const hashDemo = await calcularHashDemo(`${texto}|${voz}|${velocidad}|kokoro-v1`);
+  const hashDemo = await calcularHashDemo(`${texto}|${voz}|${velocidad}|${idioma || "es"}|kokoro-v1`);
 
   return {
     modo: "demo",

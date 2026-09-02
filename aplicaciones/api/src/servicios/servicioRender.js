@@ -1,5 +1,6 @@
 import { consultarSupabase } from "./servicioSupabase.js";
 import { dispararWorkflowRender, estaConfiguradoGitHubActions } from "./servicioGitHubActions.js";
+import { calcularHashNarracion } from "./servicioHashNarracion.js";
 import { generarAudioNarracion } from "./servicioNarracion.js";
 
 const PLACEHOLDERS = {
@@ -18,6 +19,11 @@ const TIPOS_SECCION = {
   cierre_comercial: "cierre",
   personalizada: "intro"
 };
+
+const FPS_RENDER = 30;
+const DURACION_MINIMA_SEGUNDOS = 4;
+const COLCHON_NARRACION_SEGUNDOS = 1.5;
+const PALABRAS_POR_MINUTO_DEFAULT = 125;
 
 export async function exportarDatosRender({ entorno, token, presentacionId }) {
   const presentacion = await obtenerPresentacionBase({ entorno, token, presentacionId });
@@ -51,7 +57,8 @@ export async function exportarDatosRender({ entorno, token, presentacionId }) {
     equipo: crearEquipoRender({ integrante, habilidad, habilidadIntegrante, assets: asset }),
     cierre: obtenerTextoSeccion(seccion, "cierre_comercial") || `${presentacion.empresa_objetivo} puede fortalecer su operacion nacional con automatizacion y sistemas preparados para crecer.`,
     audioNarracionUrl: obtenerAudioActual(asset),
-    secciones: crearSeccionesRender(seccion),
+    idiomaNarracion: presentacion.configuracion_tema?.idiomaNarracion || "es",
+    secciones: crearSeccionesRender(seccion, presentacion.configuracion_tema || {}),
     assets: crearAssetsRender(asset),
     configuracionLogo: {
       mostrar: presentacion.configuracion_tema?.mostrarLogoEnVideo !== false,
@@ -111,17 +118,14 @@ export async function solicitarRender({ entorno, token, usuario, datos }) {
 }
 
 async function asegurarNarracionParaRender({ entorno, token, presentacionId }) {
-  const assets = await listarPorPresentacion({ entorno, token, tabla: "asset", presentacionId, orden: "fecha_creacion.desc" });
-
-  if (buscarAsset(assets, "audio")) {
-    return { estado: "audio_existente" };
-  }
-
-  const presentacion = await obtenerPresentacionBase({ entorno, token, presentacionId });
-  const secciones = await listarPorPresentacion({ entorno, token, tabla: "seccion_video", presentacionId, orden: "orden.asc" });
+  const [assets, presentacion, secciones] = await Promise.all([
+    listarPorPresentacion({ entorno, token, tabla: "asset", presentacionId, orden: "fecha_creacion.desc" }),
+    obtenerPresentacionBase({ entorno, token, presentacionId }),
+    listarPorPresentacion({ entorno, token, tabla: "seccion_video", presentacionId, orden: "orden.asc" })
+  ]);
   const texto = secciones
     .filter((seccion) => seccion.activa_en_video !== false)
-    .map((seccion) => seccion.texto_narracion || seccion.configuracion?.descripcion || "")
+    .map(prepararTextoSeccionNarracion)
     .filter(Boolean)
     .join(" ");
 
@@ -129,16 +133,24 @@ async function asegurarNarracionParaRender({ entorno, token, presentacionId }) {
     return { estado: "sin_texto" };
   }
 
+  const datosNarracion = {
+    presentacionId,
+    texto,
+    voz: presentacion.configuracion_tema?.vozNarracion || "af_heart",
+    velocidad: Number.parseFloat(presentacion.configuracion_tema?.velocidadNarracion) || 1,
+    idioma: presentacion.configuracion_tema?.idiomaNarracion || "es"
+  };
+  const hashEsperado = await calcularHashNarracion(datosNarracion);
+
+  if (buscarAssetAudioPorHash(assets, hashEsperado)) {
+    return { estado: "audio_existente", hashNarracion: hashEsperado };
+  }
+
   try {
     const resultado = await generarAudioNarracion({
       entorno,
       token,
-      datos: {
-        presentacionId,
-        texto,
-        voz: presentacion.configuracion_tema?.vozNarracion || "af_heart",
-        velocidad: Number.parseFloat(presentacion.configuracion_tema?.velocidadNarracion) || 1
-      }
+      datos: datosNarracion
     });
 
     return {
@@ -235,7 +247,7 @@ async function crearSolicitudRender({ entorno, token, usuario, datos, versionCon
 
 function obtenerTextoSeccion(secciones, tipo) {
   const seccion = secciones.find((item) => item.tipo === tipo && item.activa_en_video !== false);
-  return seccion?.texto_narracion || seccion?.configuracion?.textoPrincipal || "";
+  return prepararTextoSeccionNarracion(seccion) || seccion?.configuracion?.textoPrincipal || "";
 }
 
 function crearTextoCliente(cliente) {
@@ -295,17 +307,24 @@ function crearHabilidadesPersona({ persona, habilidad, habilidadIntegrante }) {
     ]);
 }
 
-function crearSeccionesRender(secciones) {
+function crearSeccionesRender(secciones, configuracionTema = {}) {
   const activas = secciones
     .filter((item) => item.activa_en_video !== false)
     .sort((a, b) => a.orden - b.orden)
-    .map((item) => ({
-      tipo: TIPOS_SECCION[item.tipo] || "intro",
-      activa: true,
-      orden: item.orden,
-      animacion: item.animacion_entrada || "entrada_tecnica",
-      duracionFrames: Math.max(90, Number(item.duracion_sugerida_segundos || 5) * 30)
-    }));
+    .map((item) => {
+      const texto = prepararTextoSeccionNarracion(item);
+      const duracionManual = Number(item.duracion_sugerida_segundos || 0);
+      const duracionNarracion = calcularDuracionNarracionSegundos(texto, configuracionTema);
+      const duracionSegundos = Math.max(DURACION_MINIMA_SEGUNDOS, duracionManual, duracionNarracion);
+
+      return {
+        tipo: TIPOS_SECCION[item.tipo] || "intro",
+        activa: true,
+        orden: item.orden,
+        animacion: item.animacion_entrada || "entrada_tecnica",
+        duracionFrames: Math.round(duracionSegundos * FPS_RENDER)
+      };
+    });
 
   return activas.length > 0 ? activas : [
     { tipo: "intro", activa: true, orden: 1, duracionFrames: 150 },
@@ -318,6 +337,44 @@ function crearSeccionesRender(secciones) {
   ];
 }
 
+function prepararTextoSeccionNarracion(seccion) {
+  if (!seccion) {
+    return "";
+  }
+
+  const partes = [
+    seccion.texto_narracion,
+    seccion.configuracion?.descripcion,
+    seccion.configuracion?.textoPrincipal,
+    seccion.titulo_interno
+  ];
+
+  return limpiarTextoNarracion(partes.find((parte) => limpiarTextoNarracion(parte)) || "");
+}
+
+function calcularDuracionNarracionSegundos(texto, configuracionTema = {}) {
+  const palabras = contarPalabras(texto);
+
+  if (!palabras) {
+    return DURACION_MINIMA_SEGUNDOS;
+  }
+
+  const velocidad = Number.parseFloat(configuracionTema.velocidadNarracion) || 1;
+  const palabrasPorMinuto = Number(configuracionTema.palabrasPorMinutoNarracion) || PALABRAS_POR_MINUTO_DEFAULT;
+  const segundosNarracion = (palabras / Math.max(60, palabrasPorMinuto * velocidad)) * 60;
+
+  return Math.ceil(segundosNarracion + COLCHON_NARRACION_SEGUNDOS);
+}
+
+function contarPalabras(texto) {
+  const coincidencias = limpiarTextoNarracion(texto).match(/[A-Za-zÀ-ÿ0-9]+(?:['-][A-Za-zÀ-ÿ0-9]+)?/g);
+  return coincidencias?.length || 0;
+}
+
+function limpiarTextoNarracion(texto) {
+  return String(texto || "").replace(/\s+/g, " ").trim();
+}
+
 function crearAssetsRender(assets) {
   return {
     logo: buscarAsset(assets, "logo") || PLACEHOLDERS.logo,
@@ -327,7 +384,15 @@ function crearAssetsRender(assets) {
 }
 
 function buscarAsset(assets, tipo) {
-  return assets.find((asset) => asset.tipo === tipo && asset.estado === "disponible")?.url_publica || "";
+  return [...assets].reverse().find((asset) => asset.tipo === tipo && asset.estado === "disponible")?.url_publica || "";
+}
+
+function buscarAssetAudioPorHash(assets, hashNarracion) {
+  return assets.some((asset) => (
+    asset.tipo === "audio"
+    && asset.estado === "disponible"
+    && asset.hash_contenido === hashNarracion
+  ));
 }
 
 function obtenerAudioActual(assets) {

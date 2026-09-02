@@ -1,5 +1,5 @@
-export async function calcularHashNarracion({ texto, voz, velocidad, versionTts = "kokoro-v1" }) {
-  const contenido = normalizarContenido(`${texto}|${voz}|${velocidad}|${versionTts}`);
+export async function calcularHashNarracion({ texto, voz, velocidad, idioma = "es", versionTts = "kokoro-v1" }) {
+  const contenido = normalizarContenido(`${texto}|${voz}|${velocidad}|${idioma}|${versionTts}`);
   const bytes = new TextEncoder().encode(contenido);
   const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
   const hashArray = Array.from(new Uint8Array(hashBuffer));

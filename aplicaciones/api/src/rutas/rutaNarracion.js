@@ -16,7 +16,8 @@ export async function manejarRutaNarracion(solicitud, entorno) {
       presentacionId: limpiarTexto(cuerpo.presentacionId),
       texto: limpiarTexto(cuerpo.texto),
       voz: limpiarTexto(cuerpo.voz || "voz_predeterminada"),
-      velocidad: Number(cuerpo.velocidad || 1)
+      velocidad: Number(cuerpo.velocidad || 1),
+      idioma: limpiarTexto(cuerpo.idioma || "es")
     };
 
     if (!datos.texto) {
@@ -45,6 +46,7 @@ export async function manejarRutaNarracion(solicitud, entorno) {
         presentacionId: datos.presentacionId || null,
         voz: datos.voz,
         velocidad: datos.velocidad,
+        idioma: datos.idioma,
         modo: resultado.modo,
         cacheado: resultado.modo === "cache"
       }

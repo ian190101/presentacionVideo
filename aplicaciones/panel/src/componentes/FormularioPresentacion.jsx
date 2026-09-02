@@ -3,7 +3,7 @@ import { AyudaCampo } from "./AyudaCampo.jsx";
 import { BotonIcono } from "./BotonIcono.jsx";
 import { CampoTexto } from "./CampoTexto.jsx";
 import { SelectorFormato } from "./SelectorFormato.jsx";
-import { vocesKokoro } from "../datos/opcionesConfiguracion.js";
+import { idiomasNarracion, vocesKokoro } from "../datos/opcionesConfiguracion.js";
 
 export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, onGuardar, onGenerarVideo }) {
   function actualizar(campo, valor) {
@@ -122,6 +122,28 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
         <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
           <label className="block">
             <span className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              Idioma de narracion
+              <AyudaCampo ayuda={ayudas.narracion} />
+            </span>
+            <select
+              value={presentacion.idiomaNarracion || "es"}
+              onChange={(evento) => {
+                const idioma = idiomasNarracion.find((item) => item.valor === evento.target.value);
+                setPresentacion((actual) => ({
+                  ...actual,
+                  idiomaNarracion: evento.target.value,
+                  palabrasPorMinutoNarracion: actual.palabrasPorMinutoNarracion || idioma?.ritmoBasePpm || 125
+                }));
+              }}
+              className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-robot-cian"
+            >
+              {idiomasNarracion.map((idioma) => (
+                <option key={idioma.valor} value={idioma.valor}>{idioma.etiqueta}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
               Voz del video
               <AyudaCampo ayuda={ayudas.narracion} />
             </span>
@@ -154,6 +176,15 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
               {Number.parseFloat(presentacion.velocidadNarracion) || 1}x
             </span>
           </label>
+          <ControlRango
+            etiqueta="Ritmo para tiempos automaticos"
+            valor={presentacion.palabrasPorMinutoNarracion || 125}
+            minimo={90}
+            maximo={165}
+            sufijo=" ppm"
+            color={presentacion.colorSecundario}
+            onChange={(valor) => actualizar("palabrasPorMinutoNarracion", valor)}
+          />
         </div>
 
         <div className="grid gap-4 rounded-md border border-slate-200 p-4 sm:grid-cols-2 lg:col-span-2">

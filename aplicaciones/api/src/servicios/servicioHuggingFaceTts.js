@@ -4,7 +4,7 @@ const modeloKokoro = "hexgrad/Kokoro-82M";
 const proveedorKokoro = "fal-ai";
 const rutaKokoro = "https://router.huggingface.co/fal-ai/fal-ai/kokoro/american-english";
 
-export async function generarAudioConSdkHuggingFace({ token, texto, voz, velocidad }) {
+export async function generarAudioConSdkHuggingFace({ token, texto, voz, velocidad, idioma }) {
   const client = new InferenceClient(token);
 
   return client.textToSpeech({
@@ -13,29 +13,45 @@ export async function generarAudioConSdkHuggingFace({ token, texto, voz, velocid
     inputs: texto,
     parameters: {
       voice: voz,
-      speed: velocidad
+      speed: velocidad,
+      language: idioma
     }
   });
 }
 
-export async function generarAudioConRouterHuggingFace({ token, texto, voz, velocidad }) {
-  const respuesta = await fetch(rutaKokoro, {
+export async function generarAudioConRouterHuggingFace({ token, texto, voz, velocidad, idioma }) {
+  const cuerpo = { text: texto, voice: voz, speed: velocidad, language: idioma };
+  const respuesta = await enviarSolicitudRouter({ token, cuerpo });
+
+  if (respuesta.ok) {
+    return respuesta;
+  }
+
+  const errorConIdioma = await respuesta.text();
+  const respuestaSinIdioma = await enviarSolicitudRouter({
+    token,
+    cuerpo: { text: texto, voice: voz, speed: velocidad }
+  });
+
+  if (!respuestaSinIdioma.ok) {
+    throw new Error(await respuestaSinIdioma.text() || errorConIdioma);
+  }
+
+  return respuestaSinIdioma;
+}
+
+async function enviarSolicitudRouter({ token, cuerpo }) {
+  return fetch(rutaKokoro, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
     method: "POST",
-    body: JSON.stringify({ text: texto, voice: voz, speed: velocidad })
+    body: JSON.stringify(cuerpo)
   });
-
-  if (!respuesta.ok) {
-    throw new Error(await respuesta.text());
-  }
-
-  return respuesta;
 }
 
-export async function generarAudioKokoro({ entorno, texto, voz = "af_heart", velocidad = 1 }) {
+export async function generarAudioKokoro({ entorno, texto, voz = "af_heart", velocidad = 1, idioma = "es" }) {
   const token = entorno.HF_TOKEN;
 
   if (!token) {
@@ -46,7 +62,7 @@ export async function generarAudioKokoro({ entorno, texto, voz = "af_heart", vel
   }
 
   try {
-    const audio = await generarAudioConSdkHuggingFace({ token, texto, voz, velocidad });
+    const audio = await generarAudioConSdkHuggingFace({ token, texto, voz, velocidad, idioma });
 
     return {
       modo: "sdk_huggingface",
@@ -55,7 +71,7 @@ export async function generarAudioKokoro({ entorno, texto, voz = "af_heart", vel
       proveedor: proveedorKokoro
     };
   } catch (errorSdk) {
-    const respuesta = await generarAudioConRouterHuggingFace({ token, texto, voz, velocidad });
+    const respuesta = await generarAudioConRouterHuggingFace({ token, texto, voz, velocidad, idioma });
 
     return {
       modo: "router_huggingface",

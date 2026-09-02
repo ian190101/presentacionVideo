@@ -155,6 +155,10 @@ export function AplicacionPanel() {
         setPresentacion((actual) => ({ ...actual, ...resultado.presentacion }));
       }
 
+      if (resultado.secciones) {
+        setSecciones(resultado.secciones);
+      }
+
       await mostrarOperacionExitosa({
         titulo: "Presentacion guardada",
         mensaje: resultado.mensaje,
@@ -178,7 +182,20 @@ export function AplicacionPanel() {
 
   async function manejarGenerarVideo() {
     try {
-      const resultado = await solicitarRenderPanel({ sesion, presentacion });
+      const guardado = await guardarBorrador({ sesion, presentacion, secciones, integrantes, clientes, proyectos });
+
+      if (guardado.presentacion) {
+        setPresentacion((actual) => ({ ...actual, ...guardado.presentacion }));
+      }
+
+      if (guardado.secciones) {
+        setSecciones(guardado.secciones);
+      }
+
+      const presentacionParaRender = guardado.presentacion
+        ? { ...presentacion, ...guardado.presentacion }
+        : presentacion;
+      const resultado = await solicitarRenderPanel({ sesion, presentacion: presentacionParaRender });
 
       await mostrarRenderSolicitado({
         mensaje: resultado.mensaje,

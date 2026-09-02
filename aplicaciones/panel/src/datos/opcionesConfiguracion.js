@@ -11,6 +11,12 @@ export const vocesKokoro = [
   { valor: "am_onyx", etiqueta: "Onyx grave" }
 ];
 
+export const idiomasNarracion = [
+  { valor: "es", etiqueta: "Espanol", ritmoBasePpm: 125 },
+  { valor: "en", etiqueta: "Ingles", ritmoBasePpm: 140 },
+  { valor: "pt", etiqueta: "Portugues", ritmoBasePpm: 130 }
+];
+
 export const animacionesSeccion = [
   { valor: "entrada_tecnica", etiqueta: "Entrada tecnica" },
   { valor: "fade_suave", etiqueta: "Fade suave" },

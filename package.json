@@ -20,7 +20,7 @@
     "panel:deploy:produccion": "wrangler pages deploy dist/panel --project-name presentacion-mr-robot-panel --branch main",
     "verificar": "node scripts/verificar-calidad/verificar-estructura.js",
     "auditar": "node scripts/verificar-calidad/auditar-produccion.js",
-    "probar": "node scripts/pruebas/prueba-validaciones-api.js && node scripts/pruebas/prueba-contrato-render.js && node scripts/pruebas/prueba-exportacion-pagina.js && node scripts/pruebas/prueba-extractor-cv.js"
+    "probar": "node scripts/pruebas/prueba-validaciones-api.js && node scripts/pruebas/prueba-contrato-render.js && node scripts/pruebas/prueba-exportacion-pagina.js && node scripts/pruebas/prueba-extractor-cv.js && node scripts/pruebas/prueba-narracion-tiempos.js"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",
