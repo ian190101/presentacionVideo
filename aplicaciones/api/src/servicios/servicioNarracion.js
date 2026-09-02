@@ -20,7 +20,12 @@ export async function generarAudioNarracion({ entorno, token, datos }) {
     };
   }
 
-  const resultadoKokoro = await generarAudioKokoro({ entorno, texto: datos.texto });
+  const resultadoKokoro = await generarAudioKokoro({
+    entorno,
+    texto: datos.texto,
+    voz: datos.voz,
+    velocidad: datos.velocidad
+  });
 
   if (!resultadoKokoro.audio || !estaConfiguradoStorageAudio(entorno) || !datos.presentacionId) {
     return {

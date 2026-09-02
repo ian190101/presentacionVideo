@@ -319,6 +319,7 @@ export function AplicacionPanel() {
                 setProyectos={setProyectos}
                 integrantes={integrantes}
                 setIntegrantes={setIntegrantes}
+                assets={assets}
                 ayudas={ayudasIniciales}
               />
             </section>

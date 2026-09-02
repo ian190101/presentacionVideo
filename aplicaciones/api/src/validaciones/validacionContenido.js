@@ -12,7 +12,7 @@ const configuracionEntidad = {
     tiposPermitidos: ["internacional", "nacional", "emprendimiento", "empresa_nueva", "otro"]
   },
   proyecto: {
-    camposPermitidos: ["presentacionId", "clienteId", "nombre", "descripcion", "tipoSolucion", "stackUsado", "resultadoImpacto", "assetCapturaPrincipalId", "orden", "activo"],
+    camposPermitidos: ["presentacionId", "clienteId", "nombre", "descripcion", "tipoSolucion", "stackUsado", "resultadoImpacto", "assetCapturaPrincipalId", "configuracion", "orden", "activo"],
     requeridosCrear: ["presentacionId", "nombre", "tipoSolucion"],
     tiposPermitidos: ["web", "movil", "automatizacion", "sistema_interno", "ecommerce", "catalogo", "otro"]
   },

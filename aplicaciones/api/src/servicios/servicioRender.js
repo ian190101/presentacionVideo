@@ -45,13 +45,19 @@ export async function exportarDatosRender({ entorno, token, presentacionId }) {
     eslogan: obtenerTextoSeccion(seccion, "eslogan") || "Desarrollamos soluciones informaticas a medida, desde sistemas web hasta aplicaciones moviles.",
     subtitulo: presentacion.descripcion || "Automatizamos tus procesos para que tu te enfoques en crecer. Listo para ensamblar el engranaje que te falta?",
     clientes: cliente.map((item) => crearTextoCliente(item)),
-    proyectos: proyecto.map((item) => item.nombre),
+    proyectos: crearProyectosRender({ proyectos: proyecto, assets: asset }),
     quienesSomos: obtenerTextoSeccion(seccion, "quienes_somos") || "Somos un equipo integral enfocado en convertir procesos complejos en sistemas claros y escalables.",
-    equipo: crearEquipoRender({ integrante, habilidad, habilidadIntegrante }),
+    equipo: crearEquipoRender({ integrante, habilidad, habilidadIntegrante, assets: asset }),
     cierre: obtenerTextoSeccion(seccion, "cierre_comercial") || `${presentacion.empresa_objetivo} puede fortalecer su operacion nacional con automatizacion y sistemas preparados para crecer.`,
     audioNarracionUrl: obtenerAudioActual(asset),
     secciones: crearSeccionesRender(seccion),
-    assets: crearAssetsRender(asset)
+    assets: crearAssetsRender(asset),
+    configuracionLogo: {
+      mostrar: presentacion.configuracion_tema?.mostrarLogoEnVideo !== false,
+      radioBorde: Number(presentacion.configuracion_tema?.logoRadioBorde) || 0,
+      tamano: Number(presentacion.configuracion_tema?.logoTamano) || 100,
+      opacidad: Number(presentacion.configuracion_tema?.logoOpacidad) || 100
+    }
   };
 }
 
@@ -192,7 +198,27 @@ function crearTextoCliente(cliente) {
   return partes.join(" - ");
 }
 
-function crearEquipoRender({ integrante, habilidad, habilidadIntegrante }) {
+function crearProyectosRender({ proyectos, assets }) {
+  const assetsPorId = new Map(assets.map((asset) => [asset.id, asset]));
+
+  return proyectos.slice(0, 8).map((proyecto) => {
+    const captura = assetsPorId.get(proyecto.asset_captura_principal_id);
+
+    return {
+      nombre: proyecto.nombre,
+      descripcion: proyecto.descripcion || "",
+      stack: proyecto.stack_usado || "",
+      resultado: proyecto.resultado_impacto || "",
+      capturaUrl: captura?.url_publica || "",
+      mostrarDescripcionCaptura: proyecto.configuracion?.mostrarDescripcionCaptura !== false,
+      descripcionCaptura: proyecto.configuracion?.descripcionCaptura || proyecto.descripcion || ""
+    };
+  });
+}
+
+function crearEquipoRender({ integrante, habilidad, habilidadIntegrante, assets }) {
+  const assetsPorId = new Map(assets.map((asset) => [asset.id, asset]));
+
   return integrante.slice(0, 8).map((persona) => ({
     nombre: persona.nombre_completo,
     cargo: persona.cargo_empresa,
@@ -200,6 +226,7 @@ function crearEquipoRender({ integrante, habilidad, habilidadIntegrante }) {
     resumenProfesional: persona.resumen_profesional,
     experiencia: persona.experiencia,
     cv: persona.cv_detalle || {},
+    fotoUrl: assetsPorId.get(persona.asset_foto_id)?.url_publica || "",
     habilidades: crearHabilidadesPersona({ persona, habilidad, habilidadIntegrante })
   }));
 }
@@ -224,6 +251,7 @@ function crearSeccionesRender(secciones) {
       tipo: TIPOS_SECCION[item.tipo] || "intro",
       activa: true,
       orden: item.orden,
+      animacion: item.animacion_entrada || "entrada_tecnica",
       duracionFrames: Math.max(90, Number(item.duracion_sugerida_segundos || 5) * 30)
     }));
 

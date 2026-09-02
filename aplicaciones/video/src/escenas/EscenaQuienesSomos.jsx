@@ -1,5 +1,6 @@
-import { AbsoluteFill, interpolate, staticFile, Img } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
 import { ContenidoCentrado } from "../ui/ContenidoCentrado.jsx";
+import { LogoVideo } from "../ui/LogoVideo.jsx";
 
 export function EscenaQuienesSomos({ datos, progreso, formato }) {
   const opacidad = interpolate(progreso, [0, 0.16, 0.88, 1], [0, 1, 1, 0]);
@@ -11,15 +12,9 @@ export function EscenaQuienesSomos({ datos, progreso, formato }) {
   return (
     <AbsoluteFill style={{ opacity: opacidad }}>
       <ContenidoCentrado formato={formato}>
-        <Img
-          src={staticFile(datos.assets.logo)}
-          style={{
-            width: formato === "vertical" ? 300 : 360,
-            height: "auto",
-            marginBottom: 38,
-            transform: `translateY(${desplazamiento}px)`
-          }}
-        />
+        <div style={{ marginBottom: 38, transform: `translateY(${desplazamiento}px)` }}>
+          <LogoVideo datos={datos} formato={formato} grande />
+        </div>
         <div style={{ color: datos.colorSecundario, fontSize: 28, fontWeight: 800, marginBottom: 20 }}>
           Quienes somos
         </div>

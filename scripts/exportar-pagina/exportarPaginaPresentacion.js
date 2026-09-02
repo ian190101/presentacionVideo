@@ -57,6 +57,8 @@ function crearHtml(datos) {
     .nav { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--borde); background: color-mix(in srgb, var(--fondo-a) 84%, transparent); backdrop-filter: blur(16px); }
     .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; }
     .marca { font-weight: 900; letter-spacing: 0.08em; }
+    .marca-logo { width: 34px; height: 34px; object-fit: contain; border-radius: ${Number(datos.configuracionLogo?.radioBorde) || 0}%; }
+    .marca-wrap { display: flex; align-items: center; gap: 10px; }
     .menu { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; color: var(--texto-suave); }
     .menu a { text-decoration: none; }
     .hero { min-height: 84vh; display: grid; align-items: center; padding: 64px 0 48px; }
@@ -96,7 +98,7 @@ function crearHtml(datos) {
 <body>
   <nav class="nav">
     <div class="contenedor nav__inner">
-      <div class="marca">MR ROBOT BOLIVIA</div>
+      <div class="marca marca-wrap">${crearLogoHtml(datos)}<span>MR ROBOT BOLIVIA</span></div>
       <div class="menu">
         ${secciones.map((seccion) => `<a href="#${escaparAtributo(seccion.tipo)}">${escapar(etiquetarSeccion(seccion.tipo))}</a>`).join("")}
       </div>
@@ -126,7 +128,7 @@ function crearHtml(datos) {
     <section id="proyectos">
       <div class="contenedor">
         <div class="encabezado"><span class="eyebrow">Proyectos</span><h2>Soluciones recientes listas para mostrar</h2></div>
-        <div class="grid grid--3">${proyectos.map((proyecto) => crearCardTexto(proyecto)).join("")}</div>
+        <div class="grid grid--3">${proyectos.map(crearCardProyecto).join("")}</div>
       </div>
     </section>
 
@@ -195,7 +197,32 @@ function crearCardHabilidades(persona) {
 }
 
 function crearCardTexto(texto) {
+  if (typeof texto === "object" && texto !== null) {
+    return `<article class="card"><h3>${escapar(texto.nombre || "")}</h3><p>${escapar(texto.descripcion || texto.resultado || "")}</p></article>`;
+  }
+
   return `<article class="card"><h3>${escapar(String(texto).split(" - ")[0])}</h3><p>${escapar(String(texto))}</p></article>`;
+}
+
+function crearCardProyecto(proyecto) {
+  if (typeof proyecto !== "object" || proyecto === null) {
+    return crearCardTexto(proyecto);
+  }
+
+  return `<article class="card">
+    ${proyecto.capturaUrl ? `<img src="${escaparAtributoUrl(proyecto.capturaUrl)}" alt="${escaparAtributoUrl(proyecto.nombre)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:16px" />` : ""}
+    <h3>${escapar(proyecto.nombre || "")}</h3>
+    <p>${escapar(proyecto.descripcion || "")}</p>
+    ${proyecto.mostrarDescripcionCaptura ? `<p style="margin-top:10px">${escapar(proyecto.descripcionCaptura || "")}</p>` : ""}
+  </article>`;
+}
+
+function crearLogoHtml(datos) {
+  if (datos.configuracionLogo?.mostrar === false || !datos.assets?.logo) {
+    return "";
+  }
+
+  return `<img class="marca-logo" src="${escaparAtributoUrl(datos.assets.logo)}" alt="Logo MR Robot Bolivia" />`;
 }
 
 function crearBloqueCv(titulo, contenido) {
@@ -273,6 +300,10 @@ function escapar(valor) {
 
 function escaparAtributo(valor) {
   return escapar(String(valor || "").replace(/[^a-z0-9_-]/gi, ""));
+}
+
+function escaparAtributoUrl(valor) {
+  return escapar(String(valor || ""));
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

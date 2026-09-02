@@ -1,5 +1,6 @@
 import { AbsoluteFill, interpolate } from "remotion";
 import { ContenidoCentrado } from "../ui/ContenidoCentrado.jsx";
+import { LogoVideo } from "../ui/LogoVideo.jsx";
 
 export function EscenaIntro({ datos, progreso, formato }) {
   const escala = interpolate(progreso, [0, 0.24, 1], [0.92, 1, 1]);
@@ -8,9 +9,10 @@ export function EscenaIntro({ datos, progreso, formato }) {
   return (
     <AbsoluteFill style={{ opacity: opacidad, transform: `scale(${escala})` }}>
       <ContenidoCentrado formato={formato}>
-        <div style={{ color: datos.colorPrimario, fontWeight: 900, fontSize: formato === "vertical" ? 76 : 92 }}>
-          MR ROBOT
+        <div style={{ marginBottom: 26 }}>
+          <LogoVideo datos={datos} formato={formato} grande />
         </div>
+        <div style={{ color: datos.colorPrimario, fontWeight: 900, fontSize: formato === "vertical" ? 76 : 92 }}>MR ROBOT</div>
         <div style={{ letterSpacing: 14, fontWeight: 800, marginBottom: 46 }}>BOLIVIA</div>
         <h1 style={{ fontSize: formato === "vertical" ? 48 : 64, lineHeight: 1.08, maxWidth: 1100 }}>
           {datos.eslogan}

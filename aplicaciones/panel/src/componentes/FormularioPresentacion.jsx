@@ -3,6 +3,7 @@ import { AyudaCampo } from "./AyudaCampo.jsx";
 import { BotonIcono } from "./BotonIcono.jsx";
 import { CampoTexto } from "./CampoTexto.jsx";
 import { SelectorFormato } from "./SelectorFormato.jsx";
+import { vocesKokoro } from "../datos/opcionesConfiguracion.js";
 
 export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, onGuardar, onGenerarVideo }) {
   function actualizar(campo, valor) {
@@ -119,20 +120,100 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
           </label>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
-          <CampoTexto
-            etiqueta="Voz"
-            ayuda={ayudas.narracion}
-            valor={presentacion.vozNarracion}
-            onChange={(valor) => actualizar("vozNarracion", valor)}
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              Voz del video
+              <AyudaCampo ayuda={ayudas.narracion} />
+            </span>
+            <select
+              value={presentacion.vozNarracion || "af_heart"}
+              onChange={(evento) => actualizar("vozNarracion", evento.target.value)}
+              className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-robot-cian"
+            >
+              {vocesKokoro.map((voz) => (
+                <option key={voz.valor} value={voz.valor}>{voz.etiqueta}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              Velocidad de voz
+              <AyudaCampo ayuda={ayudas.narracion} />
+            </span>
+            <input
+              type="range"
+              min="0.7"
+              max="1.3"
+              step="0.05"
+              value={Number.parseFloat(presentacion.velocidadNarracion) || 1}
+              onChange={(evento) => actualizar("velocidadNarracion", String(evento.target.value))}
+              className="w-full accent-[var(--color-secundario)]"
+              style={{ "--color-secundario": presentacion.colorSecundario }}
+            />
+            <span className="mt-1 block text-sm font-semibold text-slate-800">
+              {Number.parseFloat(presentacion.velocidadNarracion) || 1}x
+            </span>
+          </label>
+        </div>
+
+        <div className="grid gap-4 rounded-md border border-slate-200 p-4 sm:grid-cols-2 lg:col-span-2">
+          <label className="flex items-center gap-3 text-sm font-semibold text-slate-800 sm:col-span-2">
+            <input
+              type="checkbox"
+              checked={presentacion.mostrarLogoEnVideo !== false}
+              onChange={(evento) => actualizar("mostrarLogoEnVideo", evento.target.checked)}
+              className="h-4 w-4"
+              style={{ accentColor: presentacion.colorSecundario }}
+            />
+            Mostrar logo en el video
+          </label>
+          <ControlRango
+            etiqueta="Tamano del logo"
+            valor={presentacion.logoTamano || 100}
+            minimo={40}
+            maximo={180}
+            sufijo="%"
+            color={presentacion.colorSecundario}
+            onChange={(valor) => actualizar("logoTamano", valor)}
           />
-          <CampoTexto
-            etiqueta="Velocidad"
-            ayuda={ayudas.narracion}
-            valor={presentacion.velocidadNarracion}
-            onChange={(valor) => actualizar("velocidadNarracion", valor)}
+          <ControlRango
+            etiqueta="Redondeo del logo"
+            valor={presentacion.logoRadioBorde || 0}
+            minimo={0}
+            maximo={50}
+            sufijo="%"
+            color={presentacion.colorSecundario}
+            onChange={(valor) => actualizar("logoRadioBorde", valor)}
+          />
+          <ControlRango
+            etiqueta="Opacidad del logo"
+            valor={presentacion.logoOpacidad || 100}
+            minimo={20}
+            maximo={100}
+            sufijo="%"
+            color={presentacion.colorSecundario}
+            onChange={(valor) => actualizar("logoOpacidad", valor)}
           />
         </div>
       </div>
     </section>
+  );
+}
+
+function ControlRango({ etiqueta, valor, minimo, maximo, sufijo, color, onChange }) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-700">{etiqueta}</span>
+      <input
+        type="range"
+        min={minimo}
+        max={maximo}
+        value={valor}
+        onChange={(evento) => onChange(Number(evento.target.value))}
+        className="w-full"
+        style={{ accentColor: color }}
+      />
+      <span className="mt-1 block text-sm font-semibold text-slate-800">{valor}{sufijo}</span>
+    </label>
   );
 }

@@ -11,7 +11,29 @@ export const datosPresentacionDemo = {
     "Calaminas Aroma - 5 sucursales nacionales",
     "Emprendedores y empresas nuevas"
   ],
-  proyectos: ["Proyecto FIEA", "Sistema para ferreteria", "Espacio para nuevo proyecto"],
+  proyectos: [
+    {
+      nombre: "Proyecto FIEA",
+      descripcion: "Sistema web institucional con administracion de contenido.",
+      capturaUrl: "",
+      mostrarDescripcionCaptura: true,
+      descripcionCaptura: "Vista principal preparada para presentar el alcance del proyecto."
+    },
+    {
+      nombre: "Sistema para ferreteria",
+      descripcion: "Control operativo para ventas, productos y gestion interna.",
+      capturaUrl: "",
+      mostrarDescripcionCaptura: true,
+      descripcionCaptura: "Modulo operativo listo para reemplazar procesos manuales."
+    },
+    {
+      nombre: "Espacio para nuevo proyecto",
+      descripcion: "Placeholder editable para una nueva captura real.",
+      capturaUrl: "",
+      mostrarDescripcionCaptura: false,
+      descripcionCaptura: ""
+    }
+  ],
   quienesSomos:
     "Somos un equipo integral con apoyo legal, comercial, social y tecnico, enfocado en convertir procesos complejos en sistemas claros y escalables.",
   equipo: [
@@ -104,5 +126,11 @@ export const datosPresentacionDemo = {
     logo: "placeholders/logo-mr-robot-placeholder.svg",
     capturaProyecto: "placeholders/captura-proyecto-placeholder.svg",
     fotoIntegrante: "placeholders/foto-integrante-placeholder.svg"
+  },
+  configuracionLogo: {
+    mostrar: true,
+    radioBorde: 0,
+    tamano: 100,
+    opacidad: 100
   }
 };

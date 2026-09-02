@@ -9,6 +9,7 @@ export function PanelContenidoEditable({
   setProyectos,
   integrantes,
   setIntegrantes,
+  assets = [],
   ayudas
 }) {
   return (
@@ -16,14 +17,14 @@ export function PanelContenidoEditable({
       <div className="mb-5 border-b border-slate-200 pb-4">
         <h2 className="text-lg font-bold text-slate-950">Contenido editable del video</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Clientes, proyectos y perfiles se guardan sin tocar codigo y alimentan la exportacion para Remotion.
+          Clientes, proyectos, capturas, CV y habilidades alimentan la pagina exportada y el render.
         </p>
       </div>
 
       <div className="grid gap-5">
         <EditorClientes clientes={clientes} setClientes={setClientes} ayudas={ayudas} />
-        <EditorProyectos proyectos={proyectos} setProyectos={setProyectos} />
-        <EditorIntegrantes integrantes={integrantes} setIntegrantes={setIntegrantes} />
+        <EditorProyectos proyectos={proyectos} setProyectos={setProyectos} assets={assets} />
+        <EditorIntegrantes integrantes={integrantes} setIntegrantes={setIntegrantes} assets={assets} />
       </div>
     </section>
   );
@@ -56,11 +57,7 @@ function EditorClientes({ clientes, setClientes, ayudas }) {
           <CampoTexto etiqueta="Nombre" ayuda={ayudas.empresaObjetivo} valor={cliente.nombre} onChange={(valor) => actualizar(cliente.id, "nombre", valor)} requerido />
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Tipo</span>
-            <select
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-              value={cliente.tipoCliente}
-              onChange={(evento) => actualizar(cliente.id, "tipoCliente", evento.target.value)}
-            >
+            <select className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" value={cliente.tipoCliente} onChange={(evento) => actualizar(cliente.id, "tipoCliente", evento.target.value)}>
               <option value="internacional">Internacional</option>
               <option value="nacional">Nacional</option>
               <option value="emprendimiento">Emprendimiento</option>
@@ -77,7 +74,9 @@ function EditorClientes({ clientes, setClientes, ayudas }) {
   );
 }
 
-function EditorProyectos({ proyectos, setProyectos }) {
+function EditorProyectos({ proyectos, setProyectos, assets }) {
+  const capturas = assets.filter((asset) => asset.tipo === "captura_proyecto");
+
   function actualizar(id, campo, valor) {
     setProyectos((actuales) => actuales.map((proyecto) => (proyecto.id === id ? { ...proyecto, [campo]: valor } : proyecto)));
   }
@@ -92,6 +91,9 @@ function EditorProyectos({ proyectos, setProyectos }) {
         descripcion: "",
         stackUsado: "",
         resultadoImpacto: "",
+        assetCapturaPrincipalId: "",
+        mostrarDescripcionCaptura: true,
+        descripcionCaptura: "",
         orden: actuales.length + 1,
         activo: true
       }
@@ -99,17 +101,13 @@ function EditorProyectos({ proyectos, setProyectos }) {
   }
 
   return (
-    <BloqueColeccion titulo="Proyectos" onAgregar={agregar}>
+    <BloqueColeccion titulo="Proyectos y capturas" onAgregar={agregar}>
       {proyectos.map((proyecto) => (
         <article key={proyecto.id} className="grid gap-3 rounded-md border border-slate-200 p-3 md:grid-cols-2">
           <CampoTexto etiqueta="Nombre" valor={proyecto.nombre} onChange={(valor) => actualizar(proyecto.id, "nombre", valor)} requerido />
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Tipo de solucion</span>
-            <select
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-              value={proyecto.tipoSolucion}
-              onChange={(evento) => actualizar(proyecto.id, "tipoSolucion", evento.target.value)}
-            >
+            <select className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" value={proyecto.tipoSolucion} onChange={(evento) => actualizar(proyecto.id, "tipoSolucion", evento.target.value)}>
               <option value="web">Web</option>
               <option value="movil">Movil</option>
               <option value="automatizacion">Automatizacion</option>
@@ -119,9 +117,23 @@ function EditorProyectos({ proyectos, setProyectos }) {
               <option value="otro">Otro</option>
             </select>
           </label>
-          <CampoTexto etiqueta="Descripcion" valor={proyecto.descripcion} onChange={(valor) => actualizar(proyecto.id, "descripcion", valor)} />
+          <CampoTexto etiqueta="Descripcion" valor={proyecto.descripcion} onChange={(valor) => actualizar(proyecto.id, "descripcion", valor)} multilinea maximo={500} />
           <CampoTexto etiqueta="Stack usado" valor={proyecto.stackUsado} onChange={(valor) => actualizar(proyecto.id, "stackUsado", valor)} />
           <CampoTexto etiqueta="Resultado/impacto" valor={proyecto.resultadoImpacto} onChange={(valor) => actualizar(proyecto.id, "resultadoImpacto", valor)} />
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">Captura que se mostrara</span>
+            <select className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" value={proyecto.assetCapturaPrincipalId || ""} onChange={(evento) => actualizar(proyecto.id, "assetCapturaPrincipalId", evento.target.value)}>
+              <option value="">Usar placeholder</option>
+              {capturas.map((asset) => (
+                <option key={asset.id} value={asset.id}>{asset.rutaStorage || asset.urlPublica || asset.id}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-3 text-sm font-semibold text-slate-800">
+            <input type="checkbox" checked={proyecto.mostrarDescripcionCaptura !== false} onChange={(evento) => actualizar(proyecto.id, "mostrarDescripcionCaptura", evento.target.checked)} className="h-4 w-4" />
+            Mostrar descripcion de captura
+          </label>
+          <CampoTexto etiqueta="Descripcion de la captura" valor={proyecto.descripcionCaptura || ""} onChange={(valor) => actualizar(proyecto.id, "descripcionCaptura", valor)} multilinea maximo={360} />
           <BotonEliminar onClick={() => setProyectos((actuales) => actuales.filter((item) => item.id !== proyecto.id))} />
         </article>
       ))}
@@ -129,7 +141,9 @@ function EditorProyectos({ proyectos, setProyectos }) {
   );
 }
 
-function EditorIntegrantes({ integrantes, setIntegrantes }) {
+function EditorIntegrantes({ integrantes, setIntegrantes, assets }) {
+  const fotos = assets.filter((asset) => asset.tipo === "foto_equipo");
+
   function actualizar(id, campo, valor) {
     setIntegrantes((actuales) => actuales.map((integrante) => (integrante.id === id ? { ...integrante, [campo]: valor } : integrante)));
   }
@@ -138,13 +152,7 @@ function EditorIntegrantes({ integrantes, setIntegrantes }) {
     setIntegrantes((actuales) =>
       actuales.map((integrante) =>
         integrante.id === id
-          ? {
-              ...integrante,
-              cvDetalle: {
-                ...(integrante.cvDetalle || {}),
-                [campo]: valor
-              }
-            }
+          ? { ...integrante, cvDetalle: { ...(integrante.cvDetalle || {}), [campo]: valor } }
           : integrante
       )
     );
@@ -154,14 +162,43 @@ function EditorIntegrantes({ integrantes, setIntegrantes }) {
     actualizarCv(id, campo, convertirLineasALista(valor));
   }
 
-  function actualizarHabilidades(id, valor) {
-    const habilidades = valor
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((nombre) => [nombre, 80]);
+  function actualizarHabilidad(id, indice, campo, valor) {
+    setIntegrantes((actuales) =>
+      actuales.map((integrante) => {
+        if (integrante.id !== id) return integrante;
+        const habilidades = [...(integrante.habilidades || [])];
+        const habilidadActual = normalizarHabilidad(habilidades[indice] || ["Habilidad", 80]);
+        habilidades[indice] = campo === "nombre" ? [valor, habilidadActual[1]] : [habilidadActual[0], Number(valor)];
+        return { ...integrante, habilidades };
+      })
+    );
+  }
 
-    actualizar(id, "habilidades", habilidades);
+  function agregarHabilidad(id) {
+    setIntegrantes((actuales) =>
+      actuales.map((integrante) =>
+        integrante.id === id
+          ? { ...integrante, habilidades: [...(integrante.habilidades || []), ["Nueva habilidad", 80]] }
+          : integrante
+      )
+    );
+  }
+
+  function eliminarHabilidad(id, indice) {
+    setIntegrantes((actuales) =>
+      actuales.map((integrante) =>
+        integrante.id === id
+          ? { ...integrante, habilidades: (integrante.habilidades || []).filter((_, actual) => actual !== indice) }
+          : integrante
+      )
+    );
+  }
+
+  async function importarCv(id, archivo) {
+    if (!archivo) return;
+    const texto = await archivo.text();
+    actualizarCv(id, "cvCompleto", texto);
+    actualizar(id, "experiencia", texto.slice(0, 1200));
   }
 
   function agregar() {
@@ -174,87 +211,61 @@ function EditorIntegrantes({ integrantes, setIntegrantes }) {
         especialidad: "Especialidad principal",
         resumenProfesional: "",
         experiencia: "",
-        cvDetalle: {
-          resumen: "",
-          experiencia: "",
-          estudios: [],
-          certificaciones: [],
-          logros: [],
-          stackPrincipal: "",
-          enlaces: []
-        },
+        assetFotoId: "",
+        cvDetalle: { resumen: "", experiencia: "", cvCompleto: "", estudios: [], certificaciones: [], logros: [], stackPrincipal: "", enlaces: [] },
         habilidades: [["Habilidad", 80]]
       }
     ]);
   }
 
   return (
-    <BloqueColeccion titulo="Equipo y habilidades" onAgregar={agregar}>
+    <BloqueColeccion titulo="Equipo, CV y habilidades" onAgregar={agregar}>
       {integrantes.map((integrante) => (
         <article key={integrante.id} className="grid gap-3 rounded-md border border-slate-200 p-3 md:grid-cols-2">
           <CampoTexto etiqueta="Nombre" valor={integrante.nombre} onChange={(valor) => actualizar(integrante.id, "nombre", valor)} requerido />
           <CampoTexto etiqueta="Cargo/titulo" valor={integrante.cargo} onChange={(valor) => actualizar(integrante.id, "cargo", valor)} requerido />
           <CampoTexto etiqueta="Especialidad" valor={integrante.especialidad} onChange={(valor) => actualizar(integrante.id, "especialidad", valor)} requerido />
-          <CampoTexto
-            etiqueta="Resumen profesional"
-            valor={integrante.resumenProfesional || integrante.cvDetalle?.resumen || ""}
-            onChange={(valor) => {
-              actualizar(integrante.id, "resumenProfesional", valor);
-              actualizarCv(integrante.id, "resumen", valor);
-            }}
-            multilinea
-            maximo={420}
-          />
-          <CampoTexto
-            etiqueta="Experiencia completa"
-            valor={integrante.experiencia || integrante.cvDetalle?.experiencia || ""}
-            onChange={(valor) => {
-              actualizar(integrante.id, "experiencia", valor);
-              actualizarCv(integrante.id, "experiencia", valor);
-            }}
-            multilinea
-            maximo={1200}
-          />
-          <CampoTexto
-            etiqueta="Estudios, uno por linea"
-            valor={convertirListaALineas(integrante.cvDetalle?.estudios)}
-            onChange={(valor) => actualizarListaCv(integrante.id, "estudios", valor)}
-            multilinea
-            maximo={900}
-          />
-          <CampoTexto
-            etiqueta="Certificaciones, una por linea"
-            valor={convertirListaALineas(integrante.cvDetalle?.certificaciones)}
-            onChange={(valor) => actualizarListaCv(integrante.id, "certificaciones", valor)}
-            multilinea
-            maximo={900}
-          />
-          <CampoTexto
-            etiqueta="Logros, uno por linea"
-            valor={convertirListaALineas(integrante.cvDetalle?.logros)}
-            onChange={(valor) => actualizarListaCv(integrante.id, "logros", valor)}
-            multilinea
-            maximo={900}
-          />
-          <CampoTexto
-            etiqueta="Stack principal"
-            valor={integrante.cvDetalle?.stackPrincipal || ""}
-            onChange={(valor) => actualizarCv(integrante.id, "stackPrincipal", valor)}
-            multilinea
-            maximo={500}
-          />
-          <CampoTexto
-            etiqueta="Enlaces, uno por linea"
-            valor={convertirListaALineas(integrante.cvDetalle?.enlaces)}
-            onChange={(valor) => actualizarListaCv(integrante.id, "enlaces", valor)}
-            multilinea
-            maximo={900}
-          />
-          <CampoTexto
-            etiqueta="Habilidades separadas por coma"
-            valor={(integrante.habilidades || []).map(([nombre]) => nombre).join(", ")}
-            onChange={(valor) => actualizarHabilidades(integrante.id, valor)}
-          />
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">Foto del integrante</span>
+            <select className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" value={integrante.assetFotoId || ""} onChange={(evento) => actualizar(integrante.id, "assetFotoId", evento.target.value)}>
+              <option value="">Usar placeholder</option>
+              {fotos.map((asset) => (
+                <option key={asset.id} value={asset.id}>{asset.rutaStorage || asset.urlPublica || asset.id}</option>
+              ))}
+            </select>
+          </label>
+          <CampoTexto etiqueta="Resumen profesional" valor={integrante.resumenProfesional || integrante.cvDetalle?.resumen || ""} onChange={(valor) => { actualizar(integrante.id, "resumenProfesional", valor); actualizarCv(integrante.id, "resumen", valor); }} multilinea maximo={420} />
+          <CampoTexto etiqueta="Experiencia resumida" valor={integrante.experiencia || integrante.cvDetalle?.experiencia || ""} onChange={(valor) => { actualizar(integrante.id, "experiencia", valor); actualizarCv(integrante.id, "experiencia", valor); }} multilinea maximo={1200} />
+          <CampoTexto etiqueta="CV completo pegado" valor={integrante.cvDetalle?.cvCompleto || ""} onChange={(valor) => actualizarCv(integrante.id, "cvCompleto", valor)} multilinea maximo={8000} />
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">Importar CV como texto</span>
+            <input type="file" accept=".txt,.md,.csv" onChange={(evento) => importarCv(integrante.id, evento.target.files?.[0])} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+          </label>
+          <CampoTexto etiqueta="Estudios, uno por linea" valor={convertirListaALineas(integrante.cvDetalle?.estudios)} onChange={(valor) => actualizarListaCv(integrante.id, "estudios", valor)} multilinea maximo={900} />
+          <CampoTexto etiqueta="Certificaciones, una por linea" valor={convertirListaALineas(integrante.cvDetalle?.certificaciones)} onChange={(valor) => actualizarListaCv(integrante.id, "certificaciones", valor)} multilinea maximo={900} />
+          <CampoTexto etiqueta="Logros, uno por linea" valor={convertirListaALineas(integrante.cvDetalle?.logros)} onChange={(valor) => actualizarListaCv(integrante.id, "logros", valor)} multilinea maximo={900} />
+          <CampoTexto etiqueta="Stack principal" valor={integrante.cvDetalle?.stackPrincipal || ""} onChange={(valor) => actualizarCv(integrante.id, "stackPrincipal", valor)} multilinea maximo={500} />
+          <div className="grid gap-3 rounded-md bg-slate-50 p-3 md:col-span-2">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="text-sm font-bold text-slate-900">Habilidades por porcentaje</h4>
+              <button type="button" className="text-sm font-semibold text-slate-700" onClick={() => agregarHabilidad(integrante.id)}>Agregar habilidad</button>
+            </div>
+            {(integrante.habilidades || []).map((habilidad, indice) => {
+              const [nombre, nivel] = normalizarHabilidad(habilidad);
+              return (
+                <div key={`${nombre}-${indice}`} className="grid gap-2 md:grid-cols-[minmax(0,1fr)_220px_40px]">
+                  <input value={nombre} onChange={(evento) => actualizarHabilidad(integrante.id, indice, "nombre", evento.target.value)} className="rounded-md border border-slate-200 px-3 py-2 text-sm" aria-label="Nombre de habilidad" />
+                  <label className="grid gap-1 text-xs font-semibold text-slate-700">
+                    <span>{nivel}%</span>
+                    <input type="range" min="0" max="100" value={nivel} onChange={(evento) => actualizarHabilidad(integrante.id, indice, "nivel", evento.target.value)} />
+                  </label>
+                  <button type="button" className="rounded-md border border-red-100 text-red-600" onClick={() => eliminarHabilidad(integrante.id, indice)} aria-label="Eliminar habilidad">
+                    <Trash2 size={15} aria-hidden="true" className="mx-auto" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
           <BotonEliminar onClick={() => setIntegrantes((actuales) => actuales.filter((item) => item.id !== integrante.id))} />
         </article>
       ))}
@@ -262,11 +273,16 @@ function EditorIntegrantes({ integrantes, setIntegrantes }) {
   );
 }
 
+function normalizarHabilidad(habilidad) {
+  if (Array.isArray(habilidad)) {
+    return [habilidad[0] || "Habilidad", Number(habilidad[1]) || 0];
+  }
+
+  return [habilidad?.nombre || "Habilidad", Number(habilidad?.nivelVisual) || 0];
+}
+
 function convertirLineasALista(valor) {
-  return valor
-    .split("\n")
-    .map((linea) => linea.trim())
-    .filter(Boolean);
+  return valor.split("\n").map((linea) => linea.trim()).filter(Boolean);
 }
 
 function convertirListaALineas(valor) {
@@ -287,11 +303,7 @@ function BloqueColeccion({ titulo, onAgregar, children }) {
 
 function BotonEliminar({ onClick }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-100 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 md:self-end"
-    >
+    <button type="button" onClick={onClick} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-100 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 md:self-end">
       <Trash2 size={16} aria-hidden="true" />
       Eliminar
     </button>

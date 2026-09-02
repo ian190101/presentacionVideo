@@ -30,16 +30,24 @@ export function VistaPreviaVideo({ presentacion, seccionesActivas, ayudas, asset
             }}
           />
           <div className="relative text-center">
-            {logo ? (
-              <img
-                src={logo.urlPublica}
-                alt="Logo principal"
-                className="mx-auto mb-5 h-28 w-28 object-contain"
-              />
-            ) : (
-              <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-md border border-white/30 text-3xl text-white">
-                MR
-              </div>
+            {presentacion.mostrarLogoEnVideo !== false && (
+              logo ? (
+                <img
+                  src={logo.urlPublica}
+                  alt="Logo principal"
+                  className="mx-auto mb-5 object-contain"
+                  style={{
+                    width: `${Math.max(48, Math.min(180, Number(presentacion.logoTamano || 100)))}px`,
+                    height: `${Math.max(48, Math.min(180, Number(presentacion.logoTamano || 100)))}px`,
+                    borderRadius: `${Number(presentacion.logoRadioBorde) || 0}%`,
+                    opacity: Math.max(0.2, Math.min(1, (Number(presentacion.logoOpacidad) || 100) / 100))
+                  }}
+                />
+              ) : (
+                <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-md border border-white/30 text-3xl text-white">
+                  MR
+                </div>
+              )
             )}
             <p className="text-3xl font-black tracking-wide" style={{ color: presentacion.colorPrimario }}>
               MR ROBOT

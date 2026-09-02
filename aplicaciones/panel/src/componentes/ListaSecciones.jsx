@@ -3,6 +3,7 @@ import { AyudaCampo } from "./AyudaCampo.jsx";
 import { BotonIcono } from "./BotonIcono.jsx";
 import { RelojTiempoSegmento } from "./RelojTiempoSegmento.jsx";
 import { ToggleCampo } from "./ToggleCampo.jsx";
+import { animacionesSeccion } from "../datos/opcionesConfiguracion.js";
 
 export function ListaSecciones({
   secciones,
@@ -37,7 +38,7 @@ export function ListaSecciones({
         activaEnVideo: true,
         visibleEnPreview: true,
         narracion: "",
-        animacion: "Entrada simple",
+        animacion: "entrada_tecnica",
         duracionSugeridaSegundos: 5
       }
     ]);
@@ -84,7 +85,7 @@ export function ListaSecciones({
               />
               <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-slate-500">
                 <span className="rounded bg-slate-100 px-2 py-1">{seccion.tipo}</span>
-                <span className="rounded bg-cyan-50 px-2 py-1 text-cyan-700">{seccion.animacion}</span>
+                <span className="rounded bg-cyan-50 px-2 py-1 text-cyan-700">{obtenerEtiquetaAnimacion(seccion.animacion)}</span>
               </div>
             </div>
             <div className="grid gap-3 md:col-start-2 md:grid-cols-2">
@@ -103,6 +104,21 @@ export function ListaSecciones({
                 colorSecundario={colorSecundario}
               />
             </div>
+            <label className="block md:col-start-2">
+              <span className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                Animacion de la seccion
+                <AyudaCampo ayuda={ayudas.animacion} />
+              </span>
+              <select
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                value={seccion.animacion || "entrada_tecnica"}
+                onChange={(evento) => actualizarSeccion(seccion.id, "animacion", evento.target.value)}
+              >
+                {animacionesSeccion.map((animacion) => (
+                  <option key={animacion.valor} value={animacion.valor}>{animacion.etiqueta}</option>
+                ))}
+              </select>
+            </label>
             <div className="md:col-start-2">
               <RelojTiempoSegmento
                 valorSegundos={seccion.duracionSugeridaSegundos || 5}
@@ -134,4 +150,8 @@ export function ListaSecciones({
       </div>
     </section>
   );
+}
+
+function obtenerEtiquetaAnimacion(valor) {
+  return animacionesSeccion.find((animacion) => animacion.valor === valor)?.etiqueta || valor || "Entrada tecnica";
 }

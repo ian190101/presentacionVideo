@@ -304,8 +304,12 @@ function convertirPresentacionParaApi(presentacion) {
     formatoPreferido: presentacion.formatoPreferido,
     configuracionTema: {
       calidadRender: presentacion.calidadRender || "rapida",
-      vozNarracion: presentacion.vozNarracion || "Sofia natural",
-      velocidadNarracion: presentacion.velocidadNarracion || "1.0x normal"
+      vozNarracion: presentacion.vozNarracion || "af_heart",
+      velocidadNarracion: presentacion.velocidadNarracion || "1",
+      mostrarLogoEnVideo: presentacion.mostrarLogoEnVideo !== false,
+      logoRadioBorde: Number(presentacion.logoRadioBorde) || 0,
+      logoTamano: Number(presentacion.logoTamano) || 100,
+      logoOpacidad: Number(presentacion.logoOpacidad) || 100
     },
     colorPrimario: presentacion.colorPrimario,
     colorSecundario: presentacion.colorSecundario
@@ -323,6 +327,7 @@ function convertirSeccionParaApi(seccion) {
     duracionSugeridaSegundos: seccion.duracionSugeridaSegundos || 5,
     textoNarracion: seccion.narracion || seccion.descripcion,
     animacionEntrada: seccion.animacion,
+    animacionSalida: "salida_suave",
     configuracion: {
       descripcion: seccion.descripcion
     }
@@ -338,6 +343,7 @@ function convertirIntegranteParaApi(integrante) {
     resumenProfesional: integrante.resumenProfesional || integrante.especialidad,
     experiencia: integrante.experiencia || "",
     cvDetalle: integrante.cvDetalle || crearCvDetalleDesdeIntegrante(integrante),
+    assetFotoId: integrante.assetFotoId || null,
     orden: integrante.orden || 0,
     activo: true
   };
@@ -365,6 +371,11 @@ function convertirProyectoParaApi(proyecto) {
     descripcion: proyecto.descripcion,
     stackUsado: proyecto.stackUsado,
     resultadoImpacto: proyecto.resultadoImpacto,
+    assetCapturaPrincipalId: proyecto.assetCapturaPrincipalId || null,
+    configuracion: {
+      mostrarDescripcionCaptura: proyecto.mostrarDescripcionCaptura !== false,
+      descripcionCaptura: proyecto.descripcionCaptura || ""
+    },
     orden: proyecto.orden || 0,
     activo: proyecto.activo !== false
   };
@@ -380,8 +391,12 @@ function convertirPresentacionDesdeApi(datos) {
     calidadRender: datos.configuracion_tema?.calidadRender || "rapida",
     colorPrimario: datos.color_principal || "#d40511",
     colorSecundario: datos.color_secundario || "#22c7dd",
-    vozNarracion: datos.configuracion_tema?.vozNarracion || "Sofia natural",
-    velocidadNarracion: datos.configuracion_tema?.velocidadNarracion || "1.0x normal",
+    vozNarracion: datos.configuracion_tema?.vozNarracion || "af_heart",
+    velocidadNarracion: datos.configuracion_tema?.velocidadNarracion || "1",
+    mostrarLogoEnVideo: datos.configuracion_tema?.mostrarLogoEnVideo !== false,
+    logoRadioBorde: Number(datos.configuracion_tema?.logoRadioBorde) || 0,
+    logoTamano: Number(datos.configuracion_tema?.logoTamano) || 100,
+    logoOpacidad: Number(datos.configuracion_tema?.logoOpacidad) || 100,
     duracionEstimada: "03:40",
     estadoNarracion: "pendiente",
     estadoRender: "pendiente"
@@ -398,7 +413,7 @@ function convertirSeccionDesdeApi(datos) {
     activaEnVideo: datos.activa_en_video,
     visibleEnPreview: datos.visible_en_preview,
     narracion: datos.texto_narracion || "",
-    animacion: datos.animacion_entrada || "Entrada simple",
+    animacion: datos.animacion_entrada || "entrada_tecnica",
     duracionSugeridaSegundos: datos.duracion_sugerida_segundos || 5
   };
 }
@@ -412,6 +427,7 @@ function convertirIntegranteDesdeApi(datos, relaciones = [], habilidadesPorId = 
     experiencia: datos.experiencia || "",
     resumenProfesional: datos.resumen_profesional || "",
     cvDetalle: datos.cv_detalle || {},
+    assetFotoId: datos.asset_foto_id || "",
     habilidades: relaciones
       .filter((relacion) => relacion.activo !== false)
       .map((relacion) => {
@@ -443,6 +459,9 @@ function convertirProyectoDesdeApi(datos) {
     descripcion: datos.descripcion || "",
     stackUsado: datos.stack_usado || "",
     resultadoImpacto: datos.resultado_impacto || "",
+    assetCapturaPrincipalId: datos.asset_captura_principal_id || "",
+    mostrarDescripcionCaptura: datos.configuracion?.mostrarDescripcionCaptura !== false,
+    descripcionCaptura: datos.configuracion?.descripcionCaptura || "",
     orden: datos.orden,
     activo: datos.activo
   };

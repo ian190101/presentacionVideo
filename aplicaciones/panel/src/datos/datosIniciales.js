@@ -95,8 +95,12 @@ export const presentacionInicial = {
   calidadRender: "rapida",
   colorPrimario: "#d40511",
   colorSecundario: "#22c7dd",
-  vozNarracion: "Sofia natural",
+  vozNarracion: "af_heart",
   velocidadNarracion: "1.0x normal",
+  mostrarLogoEnVideo: true,
+  logoRadioBorde: 0,
+  logoTamano: 100,
+  logoOpacidad: 100,
   duracionEstimada: "03:40",
   estadoNarracion: "pendiente",
   estadoRender: "pendiente"
@@ -114,7 +118,7 @@ export const seccionesIniciales = [
     visibleEnPreview: true,
     narracion:
       "Desarrollamos soluciones informaticas a medida. Automatizamos tus procesos para que tu te enfoques en crecer.",
-    animacion: "Entrada tecnica",
+    animacion: "entrada_tecnica",
     duracionSugeridaSegundos: 5
   },
   {
@@ -126,7 +130,7 @@ export const seccionesIniciales = [
     activaEnVideo: true,
     visibleEnPreview: true,
     narracion: "Trabajamos con clientes internacionales y nacionales en soluciones a medida.",
-    animacion: "Carrusel sobrio",
+    animacion: "fade_suave",
     duracionSugeridaSegundos: 4
   },
   {
@@ -138,7 +142,7 @@ export const seccionesIniciales = [
     activaEnVideo: true,
     visibleEnPreview: true,
     narracion: "Mostramos proyectos recientes con evidencia visual y resultados concretos.",
-    animacion: "Paneles deslizantes",
+    animacion: "paneles_deslizantes",
     duracionSugeridaSegundos: 4
   },
   {
@@ -150,7 +154,7 @@ export const seccionesIniciales = [
     activaEnVideo: true,
     visibleEnPreview: true,
     narracion: "Somos un equipo completo preparado para acompanar empresas desde la idea hasta la operacion.",
-    animacion: "Lineas conectadas",
+    animacion: "lineas_conectadas",
     duracionSugeridaSegundos: 4
   },
   {
@@ -162,7 +166,7 @@ export const seccionesIniciales = [
     activaEnVideo: true,
     visibleEnPreview: true,
     narracion: "Presentamos al equipo y sus especialidades principales.",
-    animacion: "Tarjetas escalonadas",
+    animacion: "tarjetas_escalonadas",
     duracionSugeridaSegundos: 5
   },
   {
@@ -174,7 +178,7 @@ export const seccionesIniciales = [
     activaEnVideo: true,
     visibleEnPreview: true,
     narracion: "Nuestro stack cubre frontend, backend, bases de datos, automatizacion y despliegue.",
-    animacion: "Barras progresivas",
+    animacion: "barras_progresivas",
     duracionSugeridaSegundos: 5
   },
   {
@@ -187,7 +191,7 @@ export const seccionesIniciales = [
     visibleEnPreview: true,
     narracion:
       "Sofia Embutidos puede fortalecer su operacion nacional con sistemas preparados para crecer.",
-    animacion: "Cierre ejecutivo",
+    animacion: "cierre_ejecutivo",
     duracionSugeridaSegundos: 5
   }
 ];
@@ -312,6 +316,9 @@ export const proyectosIniciales = [
     descripcion: "Sistema web para gestion y presencia institucional.",
     stackUsado: "React, API, PostgreSQL",
     resultadoImpacto: "Operacion mas clara y centralizada.",
+    assetCapturaPrincipalId: "",
+    mostrarDescripcionCaptura: true,
+    descripcionCaptura: "Captura principal del sistema web institucional.",
     orden: 1,
     activo: true
   },
@@ -322,6 +329,9 @@ export const proyectosIniciales = [
     descripcion: "Control operativo para ventas, productos y gestion interna.",
     stackUsado: "React, Node, PostgreSQL",
     resultadoImpacto: "Procesos mas rapidos y trazables.",
+    assetCapturaPrincipalId: "",
+    mostrarDescripcionCaptura: true,
+    descripcionCaptura: "Captura principal del sistema operativo.",
     orden: 2,
     activo: true
   }
