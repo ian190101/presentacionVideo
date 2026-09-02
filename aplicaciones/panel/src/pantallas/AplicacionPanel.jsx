@@ -320,6 +320,8 @@ export function AplicacionPanel() {
                 integrantes={integrantes}
                 setIntegrantes={setIntegrantes}
                 assets={assets}
+                sesion={sesion}
+                presentacion={presentacion}
                 ayudas={ayudasIniciales}
               />
             </section>

@@ -1,6 +1,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import { BotonIcono } from "./BotonIcono.jsx";
 import { CampoTexto } from "./CampoTexto.jsx";
+import { extraerCvPanel } from "../servicios/servicioCvPanel.js";
+import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
 
 export function PanelContenidoEditable({
   clientes,
@@ -10,6 +12,8 @@ export function PanelContenidoEditable({
   integrantes,
   setIntegrantes,
   assets = [],
+  sesion,
+  presentacion,
   ayudas
 }) {
   return (
@@ -24,7 +28,7 @@ export function PanelContenidoEditable({
       <div className="grid gap-5">
         <EditorClientes clientes={clientes} setClientes={setClientes} ayudas={ayudas} />
         <EditorProyectos proyectos={proyectos} setProyectos={setProyectos} assets={assets} />
-        <EditorIntegrantes integrantes={integrantes} setIntegrantes={setIntegrantes} assets={assets} />
+        <EditorIntegrantes integrantes={integrantes} setIntegrantes={setIntegrantes} assets={assets} sesion={sesion} presentacion={presentacion} />
       </div>
     </section>
   );
@@ -141,7 +145,7 @@ function EditorProyectos({ proyectos, setProyectos, assets }) {
   );
 }
 
-function EditorIntegrantes({ integrantes, setIntegrantes, assets }) {
+function EditorIntegrantes({ integrantes, setIntegrantes, assets, sesion, presentacion }) {
   const fotos = assets.filter((asset) => asset.tipo === "foto_equipo");
 
   function actualizar(id, campo, valor) {
@@ -196,9 +200,44 @@ function EditorIntegrantes({ integrantes, setIntegrantes, assets }) {
 
   async function importarCv(id, archivo) {
     if (!archivo) return;
-    const texto = await archivo.text();
-    actualizarCv(id, "cvCompleto", texto);
-    actualizar(id, "experiencia", texto.slice(0, 1200));
+
+    try {
+      const resultado = await extraerCvPanel({ sesion, integranteId: id, archivo });
+      aplicarCamposCv(id, resultado.campos || {});
+
+      await mostrarOperacionExitosa({
+        titulo: "CV importado",
+        mensaje: "El CV fue leido y distribuido en los campos editables.",
+        detalles: `Archivo: ${resultado.nombreArchivo || archivo.name}\nCaracteres: ${resultado.texto?.length || 0}`,
+        colores: obtenerColores(presentacion)
+      });
+    } catch (error) {
+      await mostrarErrorOperacion({
+        titulo: "No se pudo importar CV",
+        error,
+        colores: obtenerColores(presentacion)
+      });
+    }
+  }
+
+  function aplicarCamposCv(id, campos) {
+    setIntegrantes((actuales) =>
+      actuales.map((integrante) => {
+        if (integrante.id !== id) return integrante;
+
+        const cvDetalle = {
+          ...(integrante.cvDetalle || {}),
+          ...campos
+        };
+
+        return {
+          ...integrante,
+          resumenProfesional: campos.resumen || integrante.resumenProfesional,
+          experiencia: campos.experiencia || integrante.experiencia,
+          cvDetalle
+        };
+      })
+    );
   }
 
   function agregar() {
@@ -239,7 +278,7 @@ function EditorIntegrantes({ integrantes, setIntegrantes, assets }) {
           <CampoTexto etiqueta="CV completo pegado" valor={integrante.cvDetalle?.cvCompleto || ""} onChange={(valor) => actualizarCv(integrante.id, "cvCompleto", valor)} multilinea maximo={8000} />
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Importar CV como texto</span>
-            <input type="file" accept=".txt,.md,.csv" onChange={(evento) => importarCv(integrante.id, evento.target.files?.[0])} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            <input type="file" accept=".txt,.md,.csv,.pdf,.docx,image/png,image/jpeg,image/webp" onChange={(evento) => importarCv(integrante.id, evento.target.files?.[0])} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
           </label>
           <CampoTexto etiqueta="Estudios, uno por linea" valor={convertirListaALineas(integrante.cvDetalle?.estudios)} onChange={(valor) => actualizarListaCv(integrante.id, "estudios", valor)} multilinea maximo={900} />
           <CampoTexto etiqueta="Certificaciones, una por linea" valor={convertirListaALineas(integrante.cvDetalle?.certificaciones)} onChange={(valor) => actualizarListaCv(integrante.id, "certificaciones", valor)} multilinea maximo={900} />
@@ -308,4 +347,11 @@ function BotonEliminar({ onClick }) {
       Eliminar
     </button>
   );
+}
+
+function obtenerColores(presentacion) {
+  return {
+    colorPrimario: presentacion?.colorPrimario || "#d40511",
+    colorSecundario: presentacion?.colorSecundario || "#22c7dd"
+  };
 }

@@ -3,6 +3,7 @@ import { responderError } from "../servicios/servicioRespuesta.js";
 const intentosPorCliente = new Map();
 const METODOS_CON_CUERPO = new Set(["POST", "PUT", "PATCH"]);
 const LIMITE_CUERPO_BYTES = 1024 * 1024;
+const LIMITE_CV_BYTES = 4 * 1024 * 1024;
 const VENTANA_RATE_LIMIT_MS = 60 * 1000;
 const MAXIMO_SOLICITUDES_POR_VENTANA = 120;
 
@@ -27,7 +28,9 @@ function validarTamanoCuerpo(solicitud, entorno) {
     return null;
   }
 
-  const limite = Number(entorno.LIMITE_CUERPO_BYTES || LIMITE_CUERPO_BYTES);
+  const ruta = new URL(solicitud.url).pathname;
+  const limiteBase = Number(entorno.LIMITE_CUERPO_BYTES || LIMITE_CUERPO_BYTES);
+  const limite = ruta.startsWith("/cv/") ? Math.max(limiteBase, LIMITE_CV_BYTES) : limiteBase;
   const tamano = Number(solicitud.headers.get("content-length") || 0);
 
   if (tamano > limite) {
@@ -100,4 +103,3 @@ function limpiarRegistrosExpirados(ahora, ventanaMs) {
     }
   }
 }
-

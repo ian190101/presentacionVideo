@@ -3,6 +3,7 @@ import { manejarRutaAsset } from "./rutaAsset.js";
 import { manejarRutaAutenticacion } from "./rutaAutenticacion.js";
 import { manejarRutaAuditoria } from "./rutaAuditoria.js";
 import { manejarRutaContenido } from "./rutaContenido.js";
+import { manejarRutaCv } from "./rutaCv.js";
 import { manejarRutaIntegracion } from "./rutaIntegracion.js";
 import { manejarRutaNarracion } from "./rutaNarracion.js";
 import { manejarRutaPresentacion } from "./rutaPresentacion.js";
@@ -37,6 +38,10 @@ export async function enrutarSolicitud(solicitud, entorno, contexto) {
 
   if (ruta.startsWith("/auditoria")) {
     return manejarRutaAuditoria(solicitud, entorno, contexto);
+  }
+
+  if (ruta.startsWith("/cv")) {
+    return manejarRutaCv(solicitud, entorno, contexto);
   }
 
   if (ruta.startsWith("/integracion")) {
