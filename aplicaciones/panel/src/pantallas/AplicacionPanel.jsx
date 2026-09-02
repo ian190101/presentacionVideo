@@ -23,7 +23,7 @@ import { iniciarSesion } from "../servicios/servicioAutenticacion.js";
 import { cargarBorrador, guardarBorrador, solicitarRenderPanel } from "../servicios/servicioEditorPresentacion.js";
 import { listarAssetsPanel } from "../servicios/servicioAssetsPanel.js";
 import { obtenerLogoPublico, obtenerTemaPublico } from "../servicios/servicioLogoPublico.js";
-import { mostrarErrorOperacion, mostrarOperacionExitosa } from "../servicios/servicioAlerta.js";
+import { mostrarErrorOperacion, mostrarOperacionExitosa, mostrarRenderSolicitado } from "../servicios/servicioAlerta.js";
 import { LoginPanel } from "./LoginPanel.jsx";
 
 export function AplicacionPanel() {
@@ -180,10 +180,9 @@ export function AplicacionPanel() {
     try {
       const resultado = await solicitarRenderPanel({ sesion, presentacion });
 
-      await mostrarOperacionExitosa({
-        titulo: "Render solicitado",
+      await mostrarRenderSolicitado({
         mensaje: resultado.mensaje,
-        detalles: crearDetalleRender(resultado),
+        resultado,
         colores: {
           colorPrimario: presentacion.colorPrimario,
           colorSecundario: presentacion.colorSecundario
@@ -199,26 +198,6 @@ export function AplicacionPanel() {
         }
       });
     }
-  }
-
-  function crearDetalleRender(resultado) {
-    const datos = resultado.datos || {};
-    const workflow = datos.workflow || {};
-    const partes = [`Modo: ${resultado.modo}`];
-
-    if (workflow.urlRun) {
-      partes.push(`Run: ${workflow.urlRun}`);
-    }
-
-    if (workflow.urlWorkflow) {
-      partes.push(`Workflow: ${workflow.urlWorkflow}`);
-    }
-
-    if (workflow.mensajeDescarga) {
-      partes.push(workflow.mensajeDescarga);
-    }
-
-    return partes.join("\n");
   }
 
   function navegarASeccion(id) {

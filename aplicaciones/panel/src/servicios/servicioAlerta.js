@@ -37,6 +37,35 @@ export function mostrarOperacionExitosa({ titulo, mensaje, detalles, colores }) 
   });
 }
 
+export function mostrarRenderSolicitado({ mensaje, resultado, colores }) {
+  const datos = resultado?.datos || {};
+  const workflow = datos.workflow || {};
+
+  return Swal.fire({
+    icon: "success",
+    title: "Render solicitado",
+    html: crearHtmlRender({ mensaje, modo: resultado?.modo, workflow }),
+    confirmButtonText: "Entendido",
+    confirmButtonColor: colores.colorPrimario,
+    iconColor: colores.colorSecundario,
+    background: "#ffffff",
+    color: "#111827",
+    width: 760,
+    didOpen: () => {
+      const botonCopiar = document.querySelector("[data-copiar-render-url]");
+
+      if (!botonCopiar || !workflow.urlRun) {
+        return;
+      }
+
+      botonCopiar.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(workflow.urlRun);
+        botonCopiar.textContent = "Link copiado";
+      });
+    }
+  });
+}
+
 export function mostrarErrorConexion({ error, colores }) {
   return Swal.fire({
     icon: "error",
@@ -88,6 +117,40 @@ function crearHtmlCuenta(servicio, cuenta) {
   `;
 }
 
+function crearHtmlRender({ mensaje, modo, workflow }) {
+  const urlRun = workflow?.urlRun || "";
+  const urlWorkflow = workflow?.urlWorkflow || "";
+  const idRun = workflow?.idRun || "";
+
+  return `
+    <div style="text-align:left">
+      <p>${escaparHtml(mensaje)}</p>
+      <div style="background:#f1f5f9;padding:12px;border-radius:6px;font-size:13px;margin-top:12px">
+        <p style="margin:0 0 6px"><strong>Modo:</strong> ${escaparHtml(modo || "api")}</p>
+        ${idRun ? `<p style="margin:0 0 6px"><strong>ID del run:</strong> ${escaparHtml(idRun)}</p>` : ""}
+        ${
+          urlRun
+            ? `<p style="margin:0 0 10px;word-break:break-all"><strong>Run:</strong> ${crearLinkSeguro(urlRun)}</p>`
+            : `<p style="margin:0 0 10px"><strong>Run:</strong> GitHub todavia no devolvio el enlace del run. Entra al workflow para verlo.</p>`
+        }
+        ${urlWorkflow ? `<p style="margin:0 0 10px;word-break:break-all"><strong>Workflow:</strong> ${crearLinkSeguro(urlWorkflow)}</p>` : ""}
+        <p style="margin:0">${escaparHtml(
+          workflow?.mensajeDescarga || "Cuando termine el workflow, descarga los artefactos pagina-presentacion y videos-presentacion."
+        )}</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+        ${
+          urlRun
+            ? `<a href="${escaparAtributo(urlRun)}" target="_blank" rel="noopener noreferrer" style="${estiloBotonLink()}">Abrir run</a>
+               <button type="button" data-copiar-render-url style="${estiloBotonSecundario()}">Copiar link completo</button>`
+            : ""
+        }
+        ${urlWorkflow ? `<a href="${escaparAtributo(urlWorkflow)}" target="_blank" rel="noopener noreferrer" style="${estiloBotonSecundario()}">Abrir workflow</a>` : ""}
+      </div>
+    </div>
+  `;
+}
+
 function crearHtmlError(error) {
   const soluciones = (error?.soluciones || [])
     .map((solucion) => `<li>${escaparHtml(solucion)}</li>`)
@@ -105,6 +168,22 @@ function crearHtmlError(error) {
       <ul style="padding-left:18px">${soluciones}</ul>
     </div>
   `;
+}
+
+function crearLinkSeguro(url) {
+  return `<a href="${escaparAtributo(url)}" target="_blank" rel="noopener noreferrer">${escaparHtml(url)}</a>`;
+}
+
+function estiloBotonLink() {
+  return "display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#111827;color:#fff;text-decoration:none;padding:10px 14px;font-weight:700";
+}
+
+function estiloBotonSecundario() {
+  return "display:inline-flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid #cbd5e1;background:#fff;color:#111827;text-decoration:none;padding:10px 14px;font-weight:700;cursor:pointer";
+}
+
+function escaparAtributo(valor) {
+  return escaparHtml(valor).replaceAll("`", "&#096;");
 }
 
 function escaparHtml(valor) {
