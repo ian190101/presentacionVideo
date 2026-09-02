@@ -55,7 +55,7 @@ export async function generarAudioKokoro({ entorno, texto }) {
 
     return {
       modo: "router_huggingface",
-      respuesta,
+      audio: respuesta,
       modelo: modeloKokoro,
       proveedor: proveedorKokoro,
       fallbackPor: errorSdk.message

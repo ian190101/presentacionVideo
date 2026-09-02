@@ -133,7 +133,6 @@ function prepararDatosParaRender(datos, calidad) {
 
   return {
     ...datos,
-    audioNarracionUrl: "",
     secciones: (datos.secciones || []).map((seccion) => ({
       ...seccion,
       duracionFrames: Math.max(36, Math.min(60, Math.round(Number(seccion.duracionFrames || 90) * 0.4)))

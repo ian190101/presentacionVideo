@@ -34,7 +34,7 @@ export function PresentacionVideo({ datos, formato }) {
         overflow: "hidden"
       }}
     >
-      {datos.audioNarracionUrl && <Audio src={staticFile(datos.audioNarracionUrl)} volume={0.82} />}
+      {datos.audioNarracionUrl && <Audio src={resolverFuenteAudio(datos.audioNarracionUrl)} volume={0.82} />}
       <FondoTecnico colorPrimario={tema.colorPrimario} colorSecundario={tema.colorSecundario} />
       {escenas.map((escena) => {
         const Componente = escena.componente;
@@ -57,6 +57,14 @@ export function PresentacionVideo({ datos, formato }) {
       })}
     </AbsoluteFill>
   );
+}
+
+function resolverFuenteAudio(rutaAudio) {
+  if (/^https?:\/\//i.test(rutaAudio)) {
+    return rutaAudio;
+  }
+
+  return staticFile(rutaAudio);
 }
 
 function crearEscenasActivas(datos) {
