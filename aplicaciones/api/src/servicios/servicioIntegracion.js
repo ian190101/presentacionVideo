@@ -127,80 +127,14 @@ export async function probarConexionCloudinary(datos) {
 }
 
 export async function probarConexionHuggingFace(datos) {
-  const falKey = (datos.falKey || "").trim();
-  const token = (datos.tokenHuggingFace || "").trim();
-
-  if (!falKey) {
-    return crearResultadoError({
-      codigo: "fal_key_requerida",
-      errorTecnico: token.startsWith("hf_")
-        ? "Se encontro HF_TOKEN, pero Kokoro TTS por Fal requiere FAL_KEY."
-        : "No se envio FAL_KEY.",
-      mensaje: "Debes configurar FAL_KEY para generar voz con Kokoro TTS.",
-      soluciones: [
-        "Copia tu API Key desde Fal.",
-        "Guardala como secreto FAL_KEY en el Worker de API.",
-        "Mantener HF_TOKEN es opcional; no reemplaza FAL_KEY para este TTS."
-      ]
-    });
-  }
-
-  if (token) {
-    try {
-    const respuesta = await fetch("https://huggingface.co/api/whoami-v2", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const texto = await respuesta.text();
-
-    if (!respuesta.ok) {
-      return crearResultadoError({
-        codigo: `huggingface_http_${respuesta.status}`,
-        errorTecnico: texto,
-        mensaje: "Hugging Face rechazo el token enviado.",
-        soluciones: [
-          "Verifica que el token no tenga espacios extra.",
-          "Confirma que el token siga activo.",
-          "Genera un token nuevo si el actual fue revocado."
-        ]
-      });
-    }
-
-    const cuenta = JSON.parse(texto);
-
-    return {
-      exitosa: true,
-      servicio: "Fal / Kokoro",
-      cuenta: {
-        huggingFace: cuenta.name || cuenta.fullname || "token HF no informado",
-        falKey: "configurada",
-        proveedorTts: "fal-ai",
-        modelos: ["fal-ai/kokoro/spanish", "fal-ai/kokoro/american-english", "fal-ai/kokoro/brazilian-portuguese"]
-      }
-    };
-  } catch (error) {
-    return crearResultadoError({
-      codigo: "huggingface_error_red",
-      errorTecnico: error.message,
-      mensaje: "No se pudo conectar con Hugging Face desde el backend.",
-      soluciones: [
-        "Revisa tu conexion de red.",
-        "Confirma que el token sea valido.",
-        "Verifica que el entorno backend tenga salida a internet."
-      ]
-    });
-  }
-  }
-
   return {
     exitosa: true,
-    servicio: "Fal / Kokoro",
+    servicio: "Piper TTS",
     cuenta: {
-      falKey: "configurada",
-      proveedorTts: "fal-ai",
-      modelos: ["fal-ai/kokoro/spanish", "fal-ai/kokoro/american-english", "fal-ai/kokoro/brazilian-portuguese"]
+      proveedorTts: "piper",
+      ejecucion: "github_actions",
+      tokenCloudflare: "no requerido",
+      voces: ["es_MX-ald-medium", "es_MX-claude-high"]
     }
   };
 }

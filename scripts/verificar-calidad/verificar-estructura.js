@@ -132,7 +132,7 @@ for (const prohibido of ["SUPABASE_SERVICE_ROLE_KEY", "CLOUDINARY_API_SECRET", "
   }
 }
 
-for (const requerido of ["keep_vars = true", "[env.production]", "CORS_ORIGEN_PERMITIDO", "FAL_KEY", "HF_TOKEN", "GITHUB_TOKEN", "GITHUB_REPOSITORIO", "RATE_LIMIT_MAXIMO", "LIMITE_CUERPO_BYTES"]) {
+for (const requerido of ["keep_vars = true", "[env.production]", "CORS_ORIGEN_PERMITIDO", "Piper TTS", "GITHUB_TOKEN", "GITHUB_REPOSITORIO", "RATE_LIMIT_MAXIMO", "LIMITE_CUERPO_BYTES"]) {
   if (!configuracionWorker.includes(requerido)) {
     errores.push(`wrangler.toml no documenta configuracion de produccion: ${requerido}`);
   }

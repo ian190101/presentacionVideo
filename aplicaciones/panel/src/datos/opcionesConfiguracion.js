@@ -1,7 +1,6 @@
 export const vocesKokoro = [
-  { valor: "ef_dora", etiqueta: "Dora - espanol femenino", idioma: "es" },
-  { valor: "em_alex", etiqueta: "Alex - espanol masculino", idioma: "es" },
-  { valor: "em_santa", etiqueta: "Santa - espanol masculino", idioma: "es" },
+  { valor: "es_MX-ald-medium", etiqueta: "Ald - espanol mexicano medio", idioma: "es" },
+  { valor: "es_MX-claude-high", etiqueta: "Claude - espanol mexicano alta calidad", idioma: "es" },
   { valor: "af_heart", etiqueta: "Heart - ingles femenino", idioma: "en" },
   { valor: "af_bella", etiqueta: "Bella - ingles expresiva", idioma: "en" },
   { valor: "af_nicole", etiqueta: "Nicole - ingles suave", idioma: "en" },
@@ -18,7 +17,7 @@ export const vocesKokoro = [
 ];
 
 export const idiomasNarracion = [
-  { valor: "es", etiqueta: "Espanol", ritmoBasePpm: 125, vozPredeterminada: "ef_dora" },
+  { valor: "es", etiqueta: "Espanol latino", ritmoBasePpm: 118, vozPredeterminada: "es_MX-ald-medium" },
   { valor: "en", etiqueta: "Ingles", ritmoBasePpm: 140, vozPredeterminada: "af_heart" },
   { valor: "pt", etiqueta: "Portugues", ritmoBasePpm: 130, vozPredeterminada: "pf_dora" }
 ];

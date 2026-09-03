@@ -75,14 +75,14 @@ export const ayudasIniciales = {
     ejemplo: "La firma de subida debe generarse en el Worker, no en el navegador."
   },
   huggingFaceApi: {
-    titulo: "Conexion Fal / Kokoro",
-    descripcion: "Valida la clave usada por Kokoro TTS para generar narraciones automaticas.",
-    ejemplo: "Usa FAL_KEY como secreto backend para voces en espanol."
+    titulo: "Piper TTS",
+    descripcion: "La narracion gratuita se genera durante el render con Piper dentro de GitHub Actions.",
+    ejemplo: "No requiere token TTS en Cloudflare; la voz se selecciona desde el panel."
   },
   tokenHuggingFace: {
-    titulo: "HF Token",
-    descripcion: "Token opcional para identificar la cuenta de Hugging Face; no reemplaza FAL_KEY.",
-    ejemplo: "Kokoro TTS en espanol se genera con FAL_KEY."
+    titulo: "Proveedor TTS",
+    descripcion: "Piper usa modelos abiertos descargados en el workflow de render.",
+    ejemplo: "Para espanol latino usa es_MX-ald-medium o es_MX-claude-high."
   }
 };
 
@@ -96,7 +96,7 @@ export const presentacionInicial = {
   colorPrimario: "#d40511",
   colorSecundario: "#22c7dd",
   idiomaNarracion: "es",
-  vozNarracion: "ef_dora",
+  vozNarracion: "es_MX-ald-medium",
   velocidadNarracion: "1",
   palabrasPorMinutoNarracion: 125,
   mostrarLogoEnVideo: true,

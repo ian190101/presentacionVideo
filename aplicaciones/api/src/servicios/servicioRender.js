@@ -1,7 +1,5 @@
 import { consultarSupabase } from "./servicioSupabase.js";
 import { dispararWorkflowRender, estaConfiguradoGitHubActions } from "./servicioGitHubActions.js";
-import { calcularHashNarracion } from "./servicioHashNarracion.js";
-import { generarAudioNarracion } from "./servicioNarracion.js";
 
 const PLACEHOLDERS = {
   logo: "placeholders/logo-mr-robot-placeholder.svg",
@@ -57,7 +55,13 @@ export async function exportarDatosRender({ entorno, token, presentacionId }) {
     equipo: crearEquipoRender({ integrante, habilidad, habilidadIntegrante, assets: asset }),
     cierre: obtenerTextoSeccion(seccion, "cierre_comercial") || `${presentacion.empresa_objetivo} puede fortalecer su operacion nacional con automatizacion y sistemas preparados para crecer.`,
     audioNarracionUrl: obtenerAudioActual(asset),
+    textoNarracion: prepararTextoNarracionCompleta(seccion),
     idiomaNarracion: presentacion.configuracion_tema?.idiomaNarracion || "es",
+    vozNarracion: presentacion.configuracion_tema?.vozNarracion || "es_MX-ald-medium",
+    velocidadNarracion: Number.parseFloat(presentacion.configuracion_tema?.velocidadNarracion) || 1,
+    palabrasPorMinutoNarracion: Number(presentacion.configuracion_tema?.palabrasPorMinutoNarracion) || PALABRAS_POR_MINUTO_DEFAULT,
+    proveedorTts: presentacion.configuracion_tema?.proveedorTts || "piper",
+    narracionSecciones: crearNarracionSecciones(seccion, presentacion.configuracion_tema || {}),
     secciones: crearSeccionesRender(seccion, presentacion.configuracion_tema || {}),
     assets: crearAssetsRender(asset),
     configuracionLogo: {
@@ -70,11 +74,6 @@ export async function exportarDatosRender({ entorno, token, presentacionId }) {
 }
 
 export async function solicitarRender({ entorno, token, usuario, datos }) {
-  const narracion = await asegurarNarracionParaRender({
-    entorno,
-    token,
-    presentacionId: datos.presentacionId
-  });
   const datosRender = await exportarDatosRender({
     entorno,
     token,
@@ -100,7 +99,7 @@ export async function solicitarRender({ entorno, token, usuario, datos }) {
     return {
       solicitud,
       datosRender,
-      narracion,
+      narracion: crearEstadoNarracionRender(datosRender),
       workflow,
       mensaje: "Solicitud registrada y workflow de render disparado."
     };
@@ -109,61 +108,12 @@ export async function solicitarRender({ entorno, token, usuario, datos }) {
   return {
     solicitud,
     datosRender,
-    narracion,
+    narracion: crearEstadoNarracionRender(datosRender),
     workflow: null,
     mensaje: datos.origen === "github_actions"
       ? "Solicitud registrada. GitHub Actions no se disparo porque faltan secretos de produccion."
       : "Solicitud registrada para render local."
   };
-}
-
-async function asegurarNarracionParaRender({ entorno, token, presentacionId }) {
-  const [assets, presentacion, secciones] = await Promise.all([
-    listarPorPresentacion({ entorno, token, tabla: "asset", presentacionId, orden: "fecha_creacion.desc" }),
-    obtenerPresentacionBase({ entorno, token, presentacionId }),
-    listarPorPresentacion({ entorno, token, tabla: "seccion_video", presentacionId, orden: "orden.asc" })
-  ]);
-  const texto = secciones
-    .filter((seccion) => seccion.activa_en_video !== false)
-    .map(prepararTextoSeccionNarracion)
-    .filter(Boolean)
-    .join(" ");
-
-  if (!texto) {
-    return { estado: "sin_texto" };
-  }
-
-  const datosNarracion = {
-    presentacionId,
-    texto,
-        voz: presentacion.configuracion_tema?.vozNarracion || "ef_dora",
-    velocidad: Number.parseFloat(presentacion.configuracion_tema?.velocidadNarracion) || 1,
-    idioma: presentacion.configuracion_tema?.idiomaNarracion || "es"
-  };
-  const hashEsperado = await calcularHashNarracion(datosNarracion);
-
-  if (buscarAssetAudioPorHash(assets, hashEsperado)) {
-    return { estado: "audio_existente", hashNarracion: hashEsperado };
-  }
-
-  try {
-    const resultado = await generarAudioNarracion({
-      entorno,
-      token,
-      datos: datosNarracion
-    });
-
-    return {
-      estado: resultado.cacheado || resultado.modo === "cache" ? "audio_preparado" : "audio_generado_sin_cache",
-      modo: resultado.modo,
-      hashNarracion: resultado.hashNarracion || null
-    };
-  } catch (error) {
-    return {
-      estado: "error_generando_audio",
-      codigo: await obtenerCodigoError(error)
-    };
-  }
 }
 
 async function obtenerPresentacionBase({ entorno, token, presentacionId }) {
@@ -337,6 +287,47 @@ function crearSeccionesRender(secciones, configuracionTema = {}) {
   ];
 }
 
+function crearNarracionSecciones(secciones, configuracionTema = {}) {
+  return secciones
+    .filter((item) => item.activa_en_video !== false)
+    .sort((a, b) => a.orden - b.orden)
+    .map((item) => {
+      const texto = prepararTextoSeccionNarracion(item);
+      const duracionManual = Number(item.duracion_sugerida_segundos || 0);
+      const duracionNarracion = calcularDuracionNarracionSegundos(texto, configuracionTema);
+
+      return {
+        orden: item.orden,
+        tipo: TIPOS_SECCION[item.tipo] || "intro",
+        titulo: item.titulo_interno || "",
+        texto,
+        duracionSegundos: Math.max(DURACION_MINIMA_SEGUNDOS, duracionManual, duracionNarracion)
+      };
+    });
+}
+
+function prepararTextoNarracionCompleta(secciones) {
+  return secciones
+    .filter((item) => item.activa_en_video !== false)
+    .sort((a, b) => a.orden - b.orden)
+    .map(prepararTextoSeccionNarracion)
+    .filter(Boolean)
+    .join(" ");
+}
+
+function crearEstadoNarracionRender(datosRender) {
+  if (!limpiarTextoNarracion(datosRender.textoNarracion)) {
+    return { estado: "sin_texto", proveedor: "piper" };
+  }
+
+  return {
+    estado: "pendiente_en_workflow",
+    proveedor: datosRender.proveedorTts || "piper",
+    voz: datosRender.vozNarracion,
+    idioma: datosRender.idiomaNarracion
+  };
+}
+
 function prepararTextoSeccionNarracion(seccion) {
   if (!seccion) {
     return "";
@@ -387,23 +378,6 @@ function buscarAsset(assets, tipo) {
   return [...assets].reverse().find((asset) => asset.tipo === tipo && asset.estado === "disponible")?.url_publica || "";
 }
 
-function buscarAssetAudioPorHash(assets, hashNarracion) {
-  return assets.some((asset) => (
-    asset.tipo === "audio"
-    && asset.estado === "disponible"
-    && asset.hash_contenido === hashNarracion
-  ));
-}
-
 function obtenerAudioActual(assets) {
-  return buscarAsset(assets, "audio") || "audio/narracion-demo.wav";
-}
-
-async function obtenerCodigoError(error) {
-  if (error instanceof Response) {
-    const datos = await error.clone().json().catch(() => null);
-    return datos?.error?.codigo || `http_${error.status}`;
-  }
-
-  return error?.codigo || "error_desconocido";
+  return buscarAsset(assets, "audio") || "";
 }

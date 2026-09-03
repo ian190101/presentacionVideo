@@ -3,6 +3,7 @@ import {
   ajustarDuracionesSeccionesPorNarracion,
   prepararTextoNarracion
 } from "../../aplicaciones/panel/src/utilidades/narracion.js";
+import { obtenerVozPiper } from "../renderizar-video/vocesPiper.js";
 
 const secciones = [
   {
@@ -31,5 +32,7 @@ assert.match(texto, /Texto visible cuando no hay narracion explicita/);
 assert.equal(ajustadas.length, 2);
 assert.equal(ajustadas[0].duracionSugeridaSegundos >= secciones[0].duracionSugeridaSegundos, true);
 assert.equal(ajustadas[1].duracionSugeridaSegundos > secciones[1].duracionSugeridaSegundos, true);
+assert.equal(obtenerVozPiper("es_MX-ald-medium").region, "MX");
+assert.equal(obtenerVozPiper("voz-inexistente").id, "es_MX-ald-medium");
 
 console.log("Prueba de narracion y tiempos completada.");

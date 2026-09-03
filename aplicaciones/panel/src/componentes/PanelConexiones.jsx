@@ -133,17 +133,17 @@ export function PanelConexiones({ sesion, presentacion, ayudas }) {
         </ServicioConexion>
 
         <ServicioConexion
-          titulo="Fal / Kokoro"
+          titulo="Piper TTS"
           ayuda={ayudas.huggingFaceApi}
           estado={estadoHuggingFace}
           onProbar={() => probar("hugging-face")}
         >
           <CampoTexto
-            etiqueta="FAL Key"
+            etiqueta="FAL Key opcional"
             ayuda={ayudas.claveSecreta}
             valor={huggingFace.falKey}
             onChange={(valor) => setHuggingFace((actual) => ({ ...actual, falKey: valor }))}
-            placeholder="fal key solo backend"
+            placeholder="opcional, no requerido para Piper"
           />
           <CampoTexto
             etiqueta="HF Token opcional"
@@ -153,7 +153,7 @@ export function PanelConexiones({ sesion, presentacion, ayudas }) {
             placeholder="hf_..."
           />
           <div className="rounded-md bg-slate-50 p-3 text-xs leading-5 text-slate-600">
-            Backend esperado: `FAL_KEY`; `HF_TOKEN` es opcional y no genera Kokoro por si solo.
+            Piper genera el audio en GitHub Actions con modelos abiertos. No necesitas token TTS en Cloudflare para la voz gratuita.
           </div>
         </ServicioConexion>
       </div>

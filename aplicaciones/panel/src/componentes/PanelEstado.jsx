@@ -56,7 +56,7 @@ export function PanelEstado({ sesion, presentacion, seccionesActivas = [], ayuda
           ))}
         </div>
         <p className="mb-3 text-sm text-slate-600">
-          Idioma: {presentacion.idiomaNarracion || "es"} · Voz: {presentacion.vozNarracion} · Velocidad: {presentacion.velocidadNarracion}
+          Idioma: {presentacion.idiomaNarracion || "es"} · Voz Piper: {presentacion.vozNarracion} · Velocidad: {presentacion.velocidadNarracion}
         </p>
         <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
           <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-slate-500">

@@ -139,7 +139,7 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
                   idiomaNarracion: evento.target.value,
                   vozNarracion: vocesIdioma.some((voz) => voz.valor === actual.vozNarracion)
                     ? actual.vozNarracion
-                    : idioma?.vozPredeterminada || vocesIdioma[0]?.valor || "ef_dora",
+                    : idioma?.vozPredeterminada || vocesIdioma[0]?.valor || "es_MX-ald-medium",
                   palabrasPorMinutoNarracion: idioma?.ritmoBasePpm || 125
                 }));
               }}
@@ -156,7 +156,7 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
               <AyudaCampo ayuda={ayudas.narracion} />
             </span>
             <select
-              value={vozActualDisponible ? presentacion.vozNarracion : vocesDisponibles[0]?.valor || "ef_dora"}
+              value={vozActualDisponible ? presentacion.vozNarracion : vocesDisponibles[0]?.valor || "es_MX-ald-medium"}
               onChange={(evento) => actualizar("vozNarracion", evento.target.value)}
               className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-robot-cian"
             >

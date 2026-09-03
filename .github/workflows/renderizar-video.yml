@@ -53,6 +53,12 @@ jobs:
       - name: Ejecutar pruebas
         run: npm run probar
 
+      - name: Cachear Piper TTS
+        uses: actions/cache@v4
+        with:
+          path: .cache/piper
+          key: piper-tts-${{ runner.os }}-2023-11-14-es-mx-v1
+
       - name: Preparar datos de render
         run: |
           mkdir -p tmp/render
@@ -61,6 +67,9 @@ jobs:
           else
             cp scripts/renderizar-video/datos-presentacion-ejemplo.json tmp/render/datos-presentacion.json
           fi
+
+      - name: Generar narracion con Piper
+        run: npm run audio:piper:render -- --datos tmp/render/datos-presentacion.json --publico public --cache .cache/piper
 
       - name: Renderizar video
         run: npm run video:render:datos -- --formato "${{ inputs.formato }}" --calidad "${{ inputs.calidad }}" --datos tmp/render/datos-presentacion.json --salida dist/videos --pagina dist/pagina

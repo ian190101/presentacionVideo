@@ -19,12 +19,16 @@ export async function probarCloudinary({ token, configuracion }) {
 }
 
 export async function probarHuggingFace({ token, configuracion }) {
-  return probarConApiOFallback({
-    token,
-    ruta: "/integracion/hugging-face",
-    configuracion,
-    servicio: "Fal / Kokoro"
-  });
+  return {
+    exitosa: true,
+    servicio: "Piper TTS",
+    cuenta: {
+      proveedorTts: "piper",
+      ejecucion: "github_actions",
+      vozPredeterminada: "es_MX-ald-medium",
+      tokenCloudflare: "no requerido"
+    }
+  };
 }
 
 async function probarConApiOFallback({ token, ruta, configuracion, servicio }) {
@@ -76,12 +80,12 @@ function crearCuentaDemo({ configuracion, servicio }) {
     };
   }
 
-  if (servicio === "Fal / Kokoro") {
+  if (servicio === "Fal / Kokoro" || servicio === "Piper TTS") {
     return {
-      usuario: "modo-demo",
-      proveedorTts: "fal-ai",
-      modelo: "fal-ai/kokoro/spanish",
-      falKey: configuracion.falKey ? "key recibida" : "sin key"
+      proveedorTts: "piper",
+      ejecucion: "github_actions",
+      vozPredeterminada: "es_MX-ald-medium",
+      tokenCloudflare: "no requerido"
     };
   }
 

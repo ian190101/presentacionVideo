@@ -6,7 +6,7 @@ SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role_solo_backend
 CLOUDINARY_CLOUD_NAME=tu_cloud_name
 CLOUDINARY_API_KEY=tu_api_key
 CLOUDINARY_API_SECRET=tu_api_secret
-FAL_KEY=tu_fal_key_para_kokoro_tts
-HF_TOKEN=tu_token_hugging_face
+# Piper TTS se genera en GitHub Actions y no requiere token TTS local.
+# FAL_KEY=opcional_si_reactivas_tts_pago
 CORS_ORIGEN_PERMITIDO=http://localhost:5173
 ENTORNO=desarrollo

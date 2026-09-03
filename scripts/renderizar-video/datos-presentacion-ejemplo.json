@@ -108,7 +108,13 @@
     }
   ],
   "cierre": "Sofia Embutidos puede fortalecer su operacion nacional con automatizacion y sistemas preparados para crecer.",
-  "audioNarracionUrl": "audio/narracion-demo.wav",
+  "audioNarracionUrl": "",
+  "textoNarracion": "Desarrollamos soluciones informaticas a medida. Trabajamos con clientes nacionales e internacionales. Mostramos proyectos recientes con evidencia visual y resultados concretos. Somos un equipo completo preparado para acompanar empresas desde la idea hasta la operacion. Nuestro stack cubre frontend, backend, bases de datos, automatizacion y despliegue. Sofia Embutidos puede fortalecer su operacion nacional con sistemas preparados para crecer.",
+  "idiomaNarracion": "es",
+  "vozNarracion": "es_MX-ald-medium",
+  "velocidadNarracion": 1,
+  "palabrasPorMinutoNarracion": 118,
+  "proveedorTts": "piper",
   "secciones": [
     { "tipo": "intro", "activa": true, "orden": 1, "duracionFrames": 150 },
     { "tipo": "clientes", "activa": true, "orden": 2, "duracionFrames": 120 },

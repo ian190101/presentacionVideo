@@ -11,6 +11,7 @@
     "video:render:horizontal": "remotion render aplicaciones/video/src/index.jsx PresentacionHorizontal dist/videos/presentacion-horizontal.mp4",
     "video:render:vertical": "remotion render aplicaciones/video/src/index.jsx PresentacionVertical dist/videos/presentacion-vertical.mp4",
     "video:render:datos": "node scripts/renderizar-video/renderizarPresentacion.js",
+    "audio:piper:render": "node scripts/renderizar-video/generarAudioPiper.js",
     "pagina:exportar": "node scripts/exportar-pagina/exportarPaginaPresentacion.js",
     "pagina:deploy:produccion": "wrangler pages deploy dist/pagina --project-name presentacion-mr-robot-publica --branch main",
     "panel:deploy:workers": "npm run panel:build && wrangler deploy --config wrangler.json",

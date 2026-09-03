@@ -1,6 +1,6 @@
 # Guia de despliegue a produccion
 
-Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare Pages, Cloudflare Workers, Supabase Free, Cloudinary Free, Hugging Face y GitHub Actions solo como CI.
+Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare Pages, Cloudflare Workers, Supabase Free, Cloudinary Free, Piper TTS y GitHub Actions para CI y render.
 
 ## Componentes
 
@@ -8,9 +8,9 @@ Esta guia deja el proyecto preparado para desplegar sin costo usando Cloudflare 
 - API: Cloudflare Workers.
 - Base de datos y autenticacion: Supabase.
 - Imagenes: Cloudinary.
-- Audios cacheados: Supabase Storage como primera opcion.
-- TTS: Hugging Face con Kokoro.
-- CI: GitHub Actions solo valida calidad. El deploy y los secretos reales viven en Cloudflare.
+- Audios renderizados: Piper TTS genera WAV local dentro de GitHub Actions.
+- TTS: Piper con voces abiertas `es_MX-ald-medium` y `es_MX-claude-high`.
+- CI/render: GitHub Actions valida calidad y genera los artefactos de video. El deploy y los secretos reales viven en Cloudflare.
 
 ## Variables publicas del panel
 
@@ -33,26 +33,29 @@ wrangler secret put SUPABASE_SERVICE_ROLE_KEY --env production
 wrangler secret put CLOUDINARY_CLOUD_NAME --env production
 wrangler secret put CLOUDINARY_API_KEY --env production
 wrangler secret put CLOUDINARY_API_SECRET --env production
-wrangler secret put HF_TOKEN --env production
 wrangler secret put GITHUB_TOKEN --env production
 wrangler secret put GITHUB_REPOSITORIO --env production
 ```
 
 Regla: ninguna clave secreta se guarda en archivos del repositorio.
 
+Piper TTS no necesita `FAL_KEY` ni `HF_TOKEN` en Cloudflare. La voz se descarga en el workflow de render desde una lista cerrada de modelos permitidos.
+
 ## Secretos de GitHub Actions
 
 No guardar secretos reales en GitHub Actions.
 
-GitHub Actions solo ejecuta CI con valores placeholder para compilar:
+GitHub Actions ejecuta CI y el render bajo demanda:
 
 - `npm run verificar`
 - `npm run auditar`
 - `npm run probar`
 - `npm run panel:build`
 - `npm run pagina:exportar`
+- `npm run audio:piper:render`
+- `npm run video:render:datos`
 
-El deploy se hace desde Cloudflare conectado al repositorio o desde Wrangler local autenticado en tu maquina. Asi evitamos guardar `CLOUDFLARE_API_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY`, `CLOUDINARY_API_SECRET` o `HF_TOKEN` en GitHub.
+El deploy se hace desde Cloudflare conectado al repositorio o desde Wrangler local autenticado en tu maquina. Asi evitamos guardar `CLOUDFLARE_API_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY` o `CLOUDINARY_API_SECRET` en GitHub.
 
 ## Despliegue manual local
 
@@ -203,16 +206,21 @@ El workflow `.github/workflows/renderizar-video.yml` genera MP4 sin desplegar na
 Entradas:
 
 - `formato`: `ambos`, `horizontal` o `vertical`.
+- `calidad`: `rapida`, `equilibrada` o `alta`.
 - `datos_json_base64`: JSON de presentacion codificado en base64. Si queda vacio usa `scripts/renderizar-video/datos-presentacion-ejemplo.json`.
 
 Salida:
 
 - Artefacto `videos-presentacion` con los MP4 generados.
+- Artefacto `pagina-presentacion` con la pagina estatica.
 - Retencion de 7 dias para cuidar almacenamiento gratuito.
+
+Antes de renderizar, el workflow ejecuta `npm run audio:piper:render`. Ese paso descarga/cachea Piper y la voz seleccionada, genera `public/audio/narracion-piper.wav`, actualiza el JSON de render y alarga secciones si el audio real supera la duracion configurada.
 
 Render local equivalente:
 
 ```bash
+npm run audio:piper:render -- --datos scripts/renderizar-video/datos-presentacion-ejemplo.json --publico public
 npm run video:render:datos -- --formato ambos --datos scripts/renderizar-video/datos-presentacion-ejemplo.json --salida dist/videos
 ```
 
@@ -252,7 +260,7 @@ Ejemplo de cuerpo:
 ## Riesgos y controles
 
 - Render de video: no se ejecuta dentro de Cloudflare Workers; sigue local o por workflow especifico posterior.
-- TTS dormido: el sistema debe conservar audio cacheado y ultimo audio valido.
+- TTS externo: Piper corre localmente en el runner, por eso no depende de un proveedor pago ni de una API dormida.
 - Limites gratis: controlar cantidad de renders, audios y subidas.
 - CORS: mantener restringido a la URL real del panel.
 - RLS: probar roles antes de operar datos reales.

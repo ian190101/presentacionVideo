@@ -1,22 +1,10 @@
-import { solicitarApi } from "./servicioApi.js";
-
 export async function generarNarracionDemoOApi({ token, presentacionId, texto, voz, velocidad, idioma }) {
-  if (token && token !== "token-demo") {
-    const respuesta = await solicitarApi("/narracion/generar-audio", {
-      metodo: "POST",
-      token,
-      cuerpo: { presentacionId, texto, voz, velocidad, idioma }
-    });
-
-    return respuesta.datos;
-  }
-
-  const hashDemo = await calcularHashDemo(`${texto}|${voz}|${velocidad}|${idioma || "es"}|kokoro-v1`);
+  const hashDemo = await calcularHashDemo(`${texto}|${voz}|${velocidad}|${idioma || "es"}|piper-v1`);
 
   return {
-    modo: "demo",
+    modo: token && token !== "token-demo" && presentacionId ? "piper_render" : "demo",
     hashNarracion: hashDemo,
-    mensaje: "Modo demo: narracion preparada para cache cuando Kokoro TTS este configurado."
+    mensaje: "Narracion preparada. Piper generara el audio real dentro del render de GitHub Actions."
   };
 }
 

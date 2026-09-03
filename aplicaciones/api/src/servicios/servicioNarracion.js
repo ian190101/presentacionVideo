@@ -21,6 +21,16 @@ export async function generarAudioNarracion({ entorno, token, datos }) {
     };
   }
 
+  if (!estaConfiguradoTtsPago(entorno)) {
+    return {
+      modo: "piper_render",
+      hashNarracion,
+      cacheado: false,
+      proveedor: "piper",
+      mensaje: "Narracion preparada. El audio real se generara con Piper durante el render de GitHub Actions."
+    };
+  }
+
   const resultadoKokoro = await generarAudioKokoro({
     entorno,
     texto: datos.texto,
@@ -144,4 +154,8 @@ function obtenerFormatoAudio(mimeType) {
   }
 
   return "mp3";
+}
+
+function estaConfiguradoTtsPago(entorno) {
+  return Boolean(String(entorno.FAL_KEY || entorno.FAL_TOKEN || "").trim());
 }
