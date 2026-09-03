@@ -43,7 +43,8 @@ export async function generarAudioNarracion({ entorno, token, datos }) {
     token,
     hashNarracion,
     datos,
-    audio: resultadoKokoro.audio
+    audio: resultadoKokoro.audio,
+    mimeType: resultadoKokoro.mimeType || "audio/mpeg"
   });
 
   return {
@@ -66,13 +67,14 @@ async function buscarAudioCacheado({ entorno, token, hashNarracion, datos }) {
   return respuesta[0] || null;
 }
 
-async function guardarAudioGenerado({ entorno, token, hashNarracion, datos, audio }) {
-  const ruta = `narraciones/${hashNarracion}.mp3`;
+async function guardarAudioGenerado({ entorno, token, hashNarracion, datos, audio, mimeType }) {
+  const formato = obtenerFormatoAudio(mimeType);
+  const ruta = `narraciones/${hashNarracion}.${formato}`;
   const storage = await subirAudioSupabase({
     entorno,
     ruta,
     audio,
-    contentType: "audio/mpeg"
+    contentType: mimeType
   });
 
   const asset = await consultarSupabase({
@@ -86,7 +88,7 @@ async function guardarAudioGenerado({ entorno, token, hashNarracion, datos, audi
       proveedor: "supabase_storage",
       url_publica: storage.urlPublica,
       ruta_storage: storage.rutaStorage,
-      formato: "mp3",
+      formato,
       mime_type: storage.mimeType,
       tamano_bytes: storage.tamanoBytes,
       hash_contenido: hashNarracion,
@@ -130,4 +132,16 @@ async function guardarAudioGenerado({ entorno, token, hashNarracion, datos, audi
   });
 
   return asset[0];
+}
+
+function obtenerFormatoAudio(mimeType) {
+  if (String(mimeType || "").includes("wav")) {
+    return "wav";
+  }
+
+  if (String(mimeType || "").includes("ogg")) {
+    return "ogg";
+  }
+
+  return "mp3";
 }

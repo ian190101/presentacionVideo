@@ -28,11 +28,26 @@ export async function manejarRutaNarracion(solicitud, entorno) {
       });
     }
 
-    const resultado = await generarAudioNarracion({
-      entorno,
-      token: usuario.token,
-      datos
-    });
+    let resultado;
+
+    try {
+      resultado = await generarAudioNarracion({
+        entorno,
+        token: usuario.token,
+        datos
+      });
+    } catch (error) {
+      if (error instanceof Response) {
+        throw error;
+      }
+
+      return responderError({
+        codigo: "tts_generacion_fallida",
+        mensaje: "No se pudo generar la narracion con Hugging Face.",
+        estadoHttp: 502,
+        detalles: error.message || "Error desconocido del proveedor TTS."
+      });
+    }
 
     await registrarEventoAuditoria({
       entorno,

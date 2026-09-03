@@ -319,7 +319,7 @@ function convertirPresentacionParaApi(presentacion) {
     configuracionTema: {
       calidadRender: presentacion.calidadRender || "rapida",
       idiomaNarracion: presentacion.idiomaNarracion || "es",
-      vozNarracion: presentacion.vozNarracion || "af_heart",
+      vozNarracion: presentacion.vozNarracion || "ef_dora",
       velocidadNarracion: presentacion.velocidadNarracion || "1",
       palabrasPorMinutoNarracion: Number(presentacion.palabrasPorMinutoNarracion) || 125,
       mostrarLogoEnVideo: presentacion.mostrarLogoEnVideo !== false,
@@ -408,7 +408,7 @@ function convertirPresentacionDesdeApi(datos) {
     colorPrimario: datos.color_principal || "#d40511",
     colorSecundario: datos.color_secundario || "#22c7dd",
     idiomaNarracion: datos.configuracion_tema?.idiomaNarracion || "es",
-    vozNarracion: datos.configuracion_tema?.vozNarracion || "af_heart",
+    vozNarracion: datos.configuracion_tema?.vozNarracion || "ef_dora",
     velocidadNarracion: datos.configuracion_tema?.velocidadNarracion || "1",
     palabrasPorMinutoNarracion: Number(datos.configuracion_tema?.palabrasPorMinutoNarracion) || 125,
     mostrarLogoEnVideo: datos.configuracion_tema?.mostrarLogoEnVideo !== false,

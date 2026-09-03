@@ -136,7 +136,7 @@ async function asegurarNarracionParaRender({ entorno, token, presentacionId }) {
   const datosNarracion = {
     presentacionId,
     texto,
-    voz: presentacion.configuracion_tema?.vozNarracion || "af_heart",
+        voz: presentacion.configuracion_tema?.vozNarracion || "ef_dora",
     velocidad: Number.parseFloat(presentacion.configuracion_tema?.velocidadNarracion) || 1,
     idioma: presentacion.configuracion_tema?.idiomaNarracion || "es"
   };

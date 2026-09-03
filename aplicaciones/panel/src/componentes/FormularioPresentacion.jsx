@@ -6,6 +6,10 @@ import { SelectorFormato } from "./SelectorFormato.jsx";
 import { idiomasNarracion, vocesKokoro } from "../datos/opcionesConfiguracion.js";
 
 export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, onGuardar, onGenerarVideo }) {
+  const idiomaActual = presentacion.idiomaNarracion || "es";
+  const vocesDisponibles = vocesKokoro.filter((voz) => voz.idioma === idiomaActual);
+  const vozActualDisponible = vocesDisponibles.some((voz) => voz.valor === presentacion.vozNarracion);
+
   function actualizar(campo, valor) {
     setPresentacion((actual) => ({ ...actual, [campo]: valor }));
   }
@@ -129,10 +133,14 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
               value={presentacion.idiomaNarracion || "es"}
               onChange={(evento) => {
                 const idioma = idiomasNarracion.find((item) => item.valor === evento.target.value);
+                const vocesIdioma = vocesKokoro.filter((voz) => voz.idioma === evento.target.value);
                 setPresentacion((actual) => ({
                   ...actual,
                   idiomaNarracion: evento.target.value,
-                  palabrasPorMinutoNarracion: actual.palabrasPorMinutoNarracion || idioma?.ritmoBasePpm || 125
+                  vozNarracion: vocesIdioma.some((voz) => voz.valor === actual.vozNarracion)
+                    ? actual.vozNarracion
+                    : idioma?.vozPredeterminada || vocesIdioma[0]?.valor || "ef_dora",
+                  palabrasPorMinutoNarracion: idioma?.ritmoBasePpm || 125
                 }));
               }}
               className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-robot-cian"
@@ -148,11 +156,11 @@ export function FormularioPresentacion({ presentacion, setPresentacion, ayudas, 
               <AyudaCampo ayuda={ayudas.narracion} />
             </span>
             <select
-              value={presentacion.vozNarracion || "af_heart"}
+              value={vozActualDisponible ? presentacion.vozNarracion : vocesDisponibles[0]?.valor || "ef_dora"}
               onChange={(evento) => actualizar("vozNarracion", evento.target.value)}
               className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-robot-cian"
             >
-              {vocesKokoro.map((voz) => (
+              {vocesDisponibles.map((voz) => (
                 <option key={voz.valor} value={voz.valor}>{voz.etiqueta}</option>
               ))}
             </select>

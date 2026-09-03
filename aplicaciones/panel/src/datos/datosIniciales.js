@@ -96,7 +96,7 @@ export const presentacionInicial = {
   colorPrimario: "#d40511",
   colorSecundario: "#22c7dd",
   idiomaNarracion: "es",
-  vozNarracion: "af_heart",
+  vozNarracion: "ef_dora",
   velocidadNarracion: "1",
   palabrasPorMinutoNarracion: 125,
   mostrarLogoEnVideo: true,
