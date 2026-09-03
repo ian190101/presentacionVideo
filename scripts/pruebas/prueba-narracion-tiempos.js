@@ -3,6 +3,7 @@ import {
   ajustarDuracionesSeccionesPorNarracion,
   prepararTextoNarracion
 } from "../../aplicaciones/panel/src/utilidades/narracion.js";
+import { prepararBloquesNarracion } from "../renderizar-video/generarAudioPiper.js";
 import { obtenerVozPiper } from "../renderizar-video/vocesPiper.js";
 
 const secciones = [
@@ -34,5 +35,16 @@ assert.equal(ajustadas[0].duracionSugeridaSegundos >= secciones[0].duracionSuger
 assert.equal(ajustadas[1].duracionSugeridaSegundos > secciones[1].duracionSugeridaSegundos, true);
 assert.equal(obtenerVozPiper("es_MX-ald-medium").region, "MX");
 assert.equal(obtenerVozPiper("voz-inexistente").id, "es_MX-ald-medium");
+
+const bloques = prepararBloquesNarracion({
+  textoNarracion: "Texto completo que no debe tener prioridad.",
+  narracionSecciones: [
+    { orden: 1, tipo: "intro", texto: "Primera seccion" },
+    { orden: 2, tipo: "cierre", texto: "Segunda seccion" }
+  ]
+});
+
+assert.equal(bloques.length, 2);
+assert.equal(bloques[0].texto, "Primera seccion.");
 
 console.log("Prueba de narracion y tiempos completada.");

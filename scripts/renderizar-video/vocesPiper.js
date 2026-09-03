@@ -9,8 +9,7 @@ export const VOCES_PIPER = {
     region: "MX",
     calidad: "medium",
     archivo: "es_MX-ald-medium",
-    ruta: "es/es_MX/ald/medium",
-    sha256Modelo: "019b3803293c93e34a206dd2e53a3889209a514e786fd7144f7b70196c579b63"
+    ruta: "es/es_MX/ald/medium"
   },
   "es_MX-claude-high": {
     id: "es_MX-claude-high",
