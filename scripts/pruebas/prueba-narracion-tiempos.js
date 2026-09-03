@@ -33,6 +33,7 @@ assert.match(texto, /Texto visible cuando no hay narracion explicita/);
 assert.equal(ajustadas.length, 2);
 assert.equal(ajustadas[0].duracionSugeridaSegundos >= secciones[0].duracionSugeridaSegundos, true);
 assert.equal(ajustadas[1].duracionSugeridaSegundos > secciones[1].duracionSugeridaSegundos, true);
+assert.equal(prepararTextoNarracion([{ descripcion: "Debe leer descripcion", narracion: "" }]), "Debe leer descripcion");
 assert.equal(obtenerVozPiper("es_MX-ald-medium").region, "MX");
 assert.equal(obtenerVozPiper("voz-inexistente").id, "es_MX-ald-medium");
 

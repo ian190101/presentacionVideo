@@ -3,6 +3,10 @@ const COLCHON_SEGUNDOS = 1.5;
 const PALABRAS_POR_MINUTO_DEFAULT = 125;
 
 export function prepararTextoSeccionNarracion(seccion) {
+  if (!seccion) {
+    return "";
+  }
+
   const partes = [
     seccion.narracion,
     seccion.descripcion,

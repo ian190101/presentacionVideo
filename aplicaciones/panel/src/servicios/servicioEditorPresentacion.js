@@ -1,8 +1,5 @@
 import { solicitarApi } from "./servicioApi.js";
-import {
-  ajustarDuracionesSeccionesPorNarracion,
-  prepararTextoSeccionNarracion
-} from "../utilidades/narracion.js";
+import { ajustarDuracionesSeccionesPorNarracion } from "../utilidades/narracion.js";
 
 const CLAVE_BORRADOR_LOCAL = "presentacion_mr_robot_borrador";
 
@@ -341,7 +338,7 @@ function convertirSeccionParaApi(seccion) {
     activaEnVideo: seccion.activaEnVideo,
     visibleEnPreview: seccion.visibleEnPreview,
     duracionSugeridaSegundos: seccion.duracionSugeridaSegundos || 5,
-    textoNarracion: prepararTextoSeccionNarracion(seccion),
+    textoNarracion: limpiarTextoEditable(seccion.narracion),
     animacionEntrada: seccion.animacion,
     animacionSalida: "salida_suave",
     configuracion: {
@@ -496,6 +493,10 @@ function normalizarNombreClave(valor) {
 function normalizarIdOpcional(valor) {
   const texto = String(valor || "").trim();
   return texto && texto !== "\"\"" && texto !== "null" && texto !== "undefined" ? texto : null;
+}
+
+function limpiarTextoEditable(valor) {
+  return String(valor || "").replace(/\s+/g, " ").trim();
 }
 
 function crearCvDetalleDesdeIntegrante(integrante) {
