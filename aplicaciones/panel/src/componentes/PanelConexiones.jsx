@@ -22,6 +22,7 @@ export function PanelConexiones({ sesion, presentacion, ayudas }) {
     claveSecreta: ""
   });
   const [huggingFace, setHuggingFace] = useState({
+    falKey: "",
     tokenHuggingFace: ""
   });
   const [estadoSupabase, setEstadoSupabase] = useState(null);
@@ -132,20 +133,27 @@ export function PanelConexiones({ sesion, presentacion, ayudas }) {
         </ServicioConexion>
 
         <ServicioConexion
-          titulo="Hugging Face"
+          titulo="Fal / Kokoro"
           ayuda={ayudas.huggingFaceApi}
           estado={estadoHuggingFace}
           onProbar={() => probar("hugging-face")}
         >
           <CampoTexto
-            etiqueta="HF Token"
+            etiqueta="FAL Key"
+            ayuda={ayudas.claveSecreta}
+            valor={huggingFace.falKey}
+            onChange={(valor) => setHuggingFace((actual) => ({ ...actual, falKey: valor }))}
+            placeholder="fal key solo backend"
+          />
+          <CampoTexto
+            etiqueta="HF Token opcional"
             ayuda={ayudas.tokenHuggingFace}
             valor={huggingFace.tokenHuggingFace}
             onChange={(valor) => setHuggingFace((actual) => ({ ...actual, tokenHuggingFace: valor }))}
             placeholder="hf_..."
           />
           <div className="rounded-md bg-slate-50 p-3 text-xs leading-5 text-slate-600">
-            Backend esperado: `HF_TOKEN`, proveedor `fal-ai`, modelo `hexgrad/Kokoro-82M`.
+            Backend esperado: `FAL_KEY`; `HF_TOKEN` es opcional y no genera Kokoro por si solo.
           </div>
         </ServicioConexion>
       </div>

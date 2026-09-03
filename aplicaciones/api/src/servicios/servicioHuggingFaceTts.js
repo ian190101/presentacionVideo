@@ -1,68 +1,49 @@
-import { InferenceClient } from "@huggingface/inference";
+import { responderError } from "./servicioRespuesta.js";
 
 const modeloKokoro = "hexgrad/Kokoro-82M";
-const proveedorKokoro = "fal-ai";
+const proveedorKokoro = "fal-ai-direct";
+const TIEMPO_ESPERA_COLA_MS = 1500;
+const INTENTOS_COLA = 30;
+
 const configuracionKokoroPorIdioma = {
   es: {
-    ruta: "https://router.huggingface.co/fal-ai/fal-ai/kokoro/spanish",
+    endpoint: "fal-ai/kokoro/spanish",
     vozPredeterminada: "ef_dora",
     voces: new Set(["ef_dora", "em_alex", "em_santa"])
   },
   en: {
-    ruta: "https://router.huggingface.co/fal-ai/fal-ai/kokoro/american-english",
+    endpoint: "fal-ai/kokoro/american-english",
     vozPredeterminada: "af_heart",
     voces: new Set(["af_heart", "af_alloy", "af_aoede", "af_bella", "af_jessica", "af_kore", "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky", "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", "am_onyx", "am_puck", "am_santa"])
   },
   pt: {
-    ruta: "https://router.huggingface.co/fal-ai/fal-ai/kokoro/brazilian-portuguese",
+    endpoint: "fal-ai/kokoro/brazilian-portuguese",
     vozPredeterminada: "pf_dora",
     voces: new Set(["pf_dora", "pm_alex", "pm_santa"])
   }
 };
 
-export async function generarAudioConSdkHuggingFace({ token, texto, voz, velocidad, idioma }) {
-  const client = new InferenceClient(token);
-
-  return client.textToSpeech({
-    provider: proveedorKokoro,
-    model: modeloKokoro,
-    inputs: texto,
-    parameters: {
-      voice: voz,
-      speed: velocidad,
-      language: idioma
-    }
-  });
-}
-
-export async function generarAudioConRouterHuggingFace({ token, texto, voz, velocidad, idioma }) {
+export async function generarAudioConFal({ token, texto, voz, velocidad, idioma }) {
   const configuracion = obtenerConfiguracionKokoro(idioma);
   const vozNormalizada = normalizarVozKokoro({ voz, configuracion });
   const cuerpo = { prompt: texto, voice: vozNormalizada, speed: velocidad };
-  const respuesta = await enviarSolicitudRouter({ token, ruta: configuracion.ruta, cuerpo });
-
-  if (respuesta.ok) {
-    return obtenerAudioDesdeRespuesta(respuesta);
-  }
-
-  const errorConPrompt = await respuesta.text();
-  const respuestaSinIdioma = await enviarSolicitudRouter({
+  const respuesta = await enviarSolicitudFal({
     token,
-    ruta: configuracion.ruta,
-    cuerpo: { text: texto, voice: vozNormalizada, speed: velocidad }
+    ruta: `https://fal.run/${configuracion.endpoint}`,
+    cuerpo
   });
 
-  if (!respuestaSinIdioma.ok) {
-    throw new Error(await respuestaSinIdioma.text() || errorConPrompt);
+  if (respuesta.ok) {
+    return obtenerAudioDesdeRespuesta({ respuesta, token });
   }
 
-  return obtenerAudioDesdeRespuesta(respuestaSinIdioma);
+  throw new Error(await respuesta.text());
 }
 
-async function enviarSolicitudRouter({ token, ruta, cuerpo }) {
+async function enviarSolicitudFal({ token, ruta, cuerpo }) {
   return fetch(ruta, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Key ${token}`,
       "Content-Type": "application/json"
     },
     method: "POST",
@@ -71,60 +52,28 @@ async function enviarSolicitudRouter({ token, ruta, cuerpo }) {
 }
 
 export async function generarAudioKokoro({ entorno, texto, voz = "ef_dora", velocidad = 1, idioma = "es" }) {
-  const token = entorno.HF_TOKEN;
+  const token = obtenerFalKey(entorno);
   const idiomaNormalizado = normalizarIdiomaKokoro(idioma);
   const configuracion = obtenerConfiguracionKokoro(idiomaNormalizado);
   const vozNormalizada = normalizarVozKokoro({ voz, configuracion });
 
-  if (!token) {
-    return {
-      modo: "pendiente_configuracion",
-      mensaje: "Falta HF_TOKEN en el backend para generar audio real con Kokoro."
-    };
-  }
+  const respuesta = await generarAudioConFal({
+    token,
+    texto,
+    voz: vozNormalizada,
+    velocidad,
+    idioma: idiomaNormalizado
+  });
 
-  try {
-    if (idiomaNormalizado !== "en") {
-      throw new Error("El SDK generico no selecciona endpoint por idioma; se usa el router especifico.");
-    }
-
-    const audioSdk = await generarAudioConSdkHuggingFace({
-      token,
-      texto,
-      voz: vozNormalizada,
-      velocidad,
-      idioma: idiomaNormalizado
-    });
-
-    return {
-      modo: "sdk_huggingface",
-      audio: audioSdk,
-      mimeType: audioSdk?.type || "audio/mpeg",
-      modelo: modeloKokoro,
-      proveedor: proveedorKokoro,
-      idioma: idiomaNormalizado,
-      voz: vozNormalizada
-    };
-  } catch (errorSdk) {
-    const respuesta = await generarAudioConRouterHuggingFace({
-      token,
-      texto,
-      voz: vozNormalizada,
-      velocidad,
-      idioma: idiomaNormalizado
-    });
-
-    return {
-      modo: "router_huggingface",
-      audio: respuesta.audio,
-      mimeType: respuesta.mimeType,
-      modelo: modeloKokoro,
-      proveedor: proveedorKokoro,
-      idioma: idiomaNormalizado,
-      voz: vozNormalizada,
-      fallbackPor: errorSdk.message
-    };
-  }
+  return {
+    modo: "fal_directo",
+    audio: respuesta.audio,
+    mimeType: respuesta.mimeType,
+    modelo: modeloKokoro,
+    proveedor: proveedorKokoro,
+    idioma: idiomaNormalizado,
+    voz: vozNormalizada
+  };
 }
 
 function obtenerConfiguracionKokoro(idioma) {
@@ -141,7 +90,7 @@ function normalizarVozKokoro({ voz, configuracion }) {
   return configuracion.voces.has(texto) ? texto : configuracion.vozPredeterminada;
 }
 
-async function obtenerAudioDesdeRespuesta(respuesta) {
+async function obtenerAudioDesdeRespuesta({ respuesta, token }) {
   const tipoContenido = respuesta.headers.get("content-type") || "audio/mpeg";
 
   if (!tipoContenido.includes("application/json")) {
@@ -152,10 +101,11 @@ async function obtenerAudioDesdeRespuesta(respuesta) {
   }
 
   const datos = await respuesta.json();
-  const urlAudio = datos?.audio?.url || datos?.url;
+  const datosFinales = await resolverResultadoEnCola({ datos, token });
+  const urlAudio = datosFinales?.audio?.url || datosFinales?.audio_url || datosFinales?.url;
 
   if (!urlAudio) {
-    throw new Error(`El proveedor TTS no devolvio una URL de audio valida: ${JSON.stringify(datos)}`);
+    throw new Error(`El proveedor TTS no devolvio una URL de audio valida: ${JSON.stringify(datosFinales)}`);
   }
 
   const respuestaAudio = await fetch(urlAudio);
@@ -166,6 +116,65 @@ async function obtenerAudioDesdeRespuesta(respuesta) {
 
   return {
     audio: respuestaAudio,
-    mimeType: respuestaAudio.headers.get("content-type") || datos?.audio?.content_type || "audio/mpeg"
+    mimeType: respuestaAudio.headers.get("content-type") || datosFinales?.audio?.content_type || "audio/mpeg"
   };
+}
+
+function obtenerFalKey(entorno) {
+  const falKey = String(entorno.FAL_KEY || entorno.FAL_TOKEN || "").trim();
+
+  if (falKey) {
+    return falKey;
+  }
+
+  if (String(entorno.HF_TOKEN || "").trim().startsWith("hf_")) {
+    throw responderError({
+      codigo: "tts_fal_key_requerida",
+      mensaje: "Kokoro TTS en espanol requiere FAL_KEY en el Worker de API.",
+      estadoHttp: 500,
+      detalles: "HF_TOKEN solo valida la cuenta de Hugging Face; el endpoint fal-ai/kokoro/spanish se autentica con FAL_KEY."
+    });
+  }
+
+  throw responderError({
+    codigo: "tts_configuracion_incompleta",
+    mensaje: "Falta FAL_KEY para generar narracion real con Kokoro.",
+    estadoHttp: 500,
+    detalles: "Agrega FAL_KEY como secreto en el Worker de API."
+  });
+}
+
+async function resolverResultadoEnCola({ datos, token }) {
+  if (!datos?.response_url || !datos?.status_url) {
+    return datos;
+  }
+
+  for (let intento = 0; intento < INTENTOS_COLA; intento += 1) {
+    await esperar(TIEMPO_ESPERA_COLA_MS);
+
+    const estado = await fetch(datos.status_url, {
+      headers: { Authorization: `Key ${token}` }
+    });
+    const datosEstado = await estado.json().catch(() => null);
+
+    if (datosEstado?.status !== "COMPLETED") {
+      continue;
+    }
+
+    const respuesta = await fetch(datos.response_url, {
+      headers: { Authorization: `Key ${token}` }
+    });
+
+    if (!respuesta.ok) {
+      throw new Error(await respuesta.text());
+    }
+
+    return respuesta.json();
+  }
+
+  throw new Error("Fal no completo la generacion de audio dentro del tiempo permitido.");
+}
+
+function esperar(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

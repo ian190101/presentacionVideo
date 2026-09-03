@@ -133,10 +133,7 @@ function prepararDatosParaRender(datos, calidad) {
 
   return {
     ...datos,
-    secciones: (datos.secciones || []).map((seccion) => ({
-      ...seccion,
-      duracionFrames: Math.max(36, Math.min(60, Math.round(Number(seccion.duracionFrames || 90) * 0.4)))
-    }))
+    secciones: datos.secciones || []
   };
 }
 

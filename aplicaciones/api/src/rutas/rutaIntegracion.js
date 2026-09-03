@@ -60,6 +60,7 @@ function crearConfiguracionCloudinary(entorno, cuerpo) {
 
 function crearConfiguracionHuggingFace(entorno, cuerpo) {
   return {
+    falKey: cuerpo.falKey || entorno.FAL_KEY || entorno.FAL_TOKEN,
     tokenHuggingFace: cuerpo.tokenHuggingFace || entorno.HF_TOKEN
   };
 }

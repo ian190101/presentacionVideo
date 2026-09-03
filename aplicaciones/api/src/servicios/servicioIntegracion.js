@@ -127,22 +127,26 @@ export async function probarConexionCloudinary(datos) {
 }
 
 export async function probarConexionHuggingFace(datos) {
+  const falKey = (datos.falKey || "").trim();
   const token = (datos.tokenHuggingFace || "").trim();
 
-  if (!token) {
+  if (!falKey) {
     return crearResultadoError({
-      codigo: "huggingface_token_requerido",
-      errorTecnico: "No se envio HF_TOKEN.",
-      mensaje: "Debes ingresar un token de Hugging Face para probar Kokoro TTS.",
+      codigo: "fal_key_requerida",
+      errorTecnico: token.startsWith("hf_")
+        ? "Se encontro HF_TOKEN, pero Kokoro TTS por Fal requiere FAL_KEY."
+        : "No se envio FAL_KEY.",
+      mensaje: "Debes configurar FAL_KEY para generar voz con Kokoro TTS.",
       soluciones: [
-        "Copia tu token desde Hugging Face > Settings > Access Tokens.",
-        "Usa un token con permiso de inferencia.",
-        "No publiques este token en codigo frontend ni repositorios."
+        "Copia tu API Key desde Fal.",
+        "Guardala como secreto FAL_KEY en el Worker de API.",
+        "Mantener HF_TOKEN es opcional; no reemplaza FAL_KEY para este TTS."
       ]
     });
   }
 
-  try {
+  if (token) {
+    try {
     const respuesta = await fetch("https://huggingface.co/api/whoami-v2", {
       headers: {
         Authorization: `Bearer ${token}`
@@ -168,12 +172,12 @@ export async function probarConexionHuggingFace(datos) {
 
     return {
       exitosa: true,
-      servicio: "Hugging Face",
+      servicio: "Fal / Kokoro",
       cuenta: {
-        usuario: cuenta.name || cuenta.fullname || "usuario no informado",
-        tipo: cuenta.type || "tipo no informado",
+        huggingFace: cuenta.name || cuenta.fullname || "token HF no informado",
+        falKey: "configurada",
         proveedorTts: "fal-ai",
-        modelo: "hexgrad/Kokoro-82M"
+        modelos: ["fal-ai/kokoro/spanish", "fal-ai/kokoro/american-english", "fal-ai/kokoro/brazilian-portuguese"]
       }
     };
   } catch (error) {
@@ -188,6 +192,17 @@ export async function probarConexionHuggingFace(datos) {
       ]
     });
   }
+  }
+
+  return {
+    exitosa: true,
+    servicio: "Fal / Kokoro",
+    cuenta: {
+      falKey: "configurada",
+      proveedorTts: "fal-ai",
+      modelos: ["fal-ai/kokoro/spanish", "fal-ai/kokoro/american-english", "fal-ai/kokoro/brazilian-portuguese"]
+    }
+  };
 }
 
 function crearResultadoError({ codigo, errorTecnico, mensaje, soluciones }) {

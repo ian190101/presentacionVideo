@@ -75,14 +75,14 @@ export const ayudasIniciales = {
     ejemplo: "La firma de subida debe generarse en el Worker, no en el navegador."
   },
   huggingFaceApi: {
-    titulo: "Conexion Hugging Face",
-    descripcion: "Valida el token usado por Kokoro TTS para generar narraciones automaticas.",
-    ejemplo: "Usa un token HF con permiso de inferencia y guardalo como secreto backend."
+    titulo: "Conexion Fal / Kokoro",
+    descripcion: "Valida la clave usada por Kokoro TTS para generar narraciones automaticas.",
+    ejemplo: "Usa FAL_KEY como secreto backend para voces en espanol."
   },
   tokenHuggingFace: {
     titulo: "HF Token",
-    descripcion: "Token secreto para consumir modelos de Hugging Face desde backend.",
-    ejemplo: "En produccion debe vivir como HF_TOKEN en Cloudflare Workers, no en frontend."
+    descripcion: "Token opcional para identificar la cuenta de Hugging Face; no reemplaza FAL_KEY.",
+    ejemplo: "Kokoro TTS en espanol se genera con FAL_KEY."
   }
 };
 

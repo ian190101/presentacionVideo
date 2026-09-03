@@ -23,7 +23,7 @@ export async function probarHuggingFace({ token, configuracion }) {
     token,
     ruta: "/integracion/hugging-face",
     configuracion,
-    servicio: "Hugging Face"
+    servicio: "Fal / Kokoro"
   });
 }
 
@@ -76,12 +76,12 @@ function crearCuentaDemo({ configuracion, servicio }) {
     };
   }
 
-  if (servicio === "Hugging Face") {
+  if (servicio === "Fal / Kokoro") {
     return {
       usuario: "modo-demo",
       proveedorTts: "fal-ai",
-      modelo: "hexgrad/Kokoro-82M",
-      token: configuracion.tokenHuggingFace ? "token recibido" : "sin token"
+      modelo: "fal-ai/kokoro/spanish",
+      falKey: configuracion.falKey ? "key recibida" : "sin key"
     };
   }
 
